@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
