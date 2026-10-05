@@ -2,9 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 /**
  * AngelVideo: full-viewport angel intro video (/videos/intro-reveal.mp4).
- * Plays once, muted, as soon as `play` is true, then calls `onEnded`.
- * Falls back to `onEnded` if autoplay is blocked, the file fails to load,
- * or the video stalls past `maxDurationMs`.
+ * Fully responsive across 16:9, ultrawide, tablet portrait, mobile portrait, and F11/native fullscreen.
  */
 export default function AngelVideo({ play, onEnded, maxDurationMs = 15000 }) {
   const videoRef = useRef(null);
@@ -42,10 +40,10 @@ export default function AngelVideo({ play, onEnded, maxDurationMs = 15000 }) {
     <div
       id="angel-video-stage"
       style={{
-        position: 'absolute',
-        inset: 0,
+        position: 'relative',
         width: '100%',
-        height: '100%',
+        height: '100vh',
+        minHeight: '100svh',
         backgroundColor: '#000000',
         overflow: 'hidden'
       }}
@@ -58,14 +56,25 @@ export default function AngelVideo({ play, onEnded, maxDurationMs = 15000 }) {
         preload="auto"
         aria-hidden="true"
         style={{
+          position: 'absolute',
+          inset: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center',
+          objectPosition: 'var(--video-pos, center top)',
           filter: 'grayscale(100%) contrast(120%) brightness(0.88)',
           display: 'block'
         }}
       />
+
+      <style>{`
+        video:fullscreen,
+        video:-webkit-full-screen {
+          object-fit: contain !important;
+          width: 100% !important;
+          height: 100% !important;
+        }
+      `}</style>
     </div>
   );
 }

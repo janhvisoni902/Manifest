@@ -33,7 +33,6 @@ export default function HelloSection() {
         }
 
         if (isDesktop) {
-          // Desktop: Hitch mechanism (arrive, settle, pause 0.8s, release)
           createHitchTrigger({
             sectionEl: el,
             sectionName: 'HelloSection',
@@ -68,14 +67,13 @@ export default function HelloSection() {
         position: 'relative',
         zIndex: 2,
         width: '100%',
-        minHeight: '100svh',
-        height: '100vh',
+        minHeight: '100dvh',
         backgroundColor: '#E9E9E9',
         color: '#181818',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: '120px 2.5rem 140px',
+        padding: 'clamp(60px, 8vh, 100px) 2.5rem clamp(60px, 8vh, 100px)',
         boxSizing: 'border-box'
       }}
     >
@@ -89,18 +87,18 @@ export default function HelloSection() {
           willChange: 'transform, opacity'
         }}
       >
-        {/* Editorial Headline (h2 for accessibility compliance since MTM section holds the single h1) */}
+        {/* Editorial Headline (h2 for accessibility compliance since MTM section holds single h1) */}
         <h2
           className="animate-item"
           style={{
             fontFamily: 'var(--font-intro)',
-            fontSize: 'clamp(3.5rem, 8.5vw, 7.5rem)',
+            fontSize: 'clamp(2.8rem, 6.5vw, 6rem)',
             fontWeight: 900,
             letterSpacing: '-0.04em',
             lineHeight: 0.92,
             color: '#181818',
             textTransform: 'uppercase',
-            margin: '0 0 3rem 0',
+            margin: '0 0 2.5rem 0',
             maxWidth: '1000px',
             opacity: 0,
             transform: 'translateY(30px)',
@@ -116,7 +114,7 @@ export default function HelloSection() {
         <p
           className="animate-item"
           style={{
-            fontSize: 'clamp(1.3rem, 2.4vw, 2.2rem)',
+            fontSize: 'clamp(1.1rem, 2vw, 1.8rem)',
             fontWeight: 700,
             letterSpacing: '-0.02em',
             lineHeight: 1.35,

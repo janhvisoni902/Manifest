@@ -2,31 +2,15 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from '../../lib/router';
-import { createHitchTrigger, isDebugMode } from '../../lib/hitch';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function WhatWeDo() {
-  const containerRef = useRef(null);
-  const pointRefs = useRef([]);
+  const triggerRef = useRef(null);
+  const trackRef = useRef(null);
 
-  const pointsData = [
+  const pillars = [
     {
-      type: 'hero',
-      id: 'wwd-point-0',
-      imgSrc: '/images/what-we-do-hero.jpg',
-      alt: 'WHAT WE DO — Manifest Tech Media'
-    },
-    {
-      type: 'intro',
-      id: 'wwd-point-1',
-      badge: '— THE SYSTEM',
-      title: 'WE TURN AD SPEND INTO REVENUE SYSTEMS.',
-      desc: 'A continuous architecture engineered to align brand authority, media acquisition, and unit economics into scalable enterprise growth.'
-    },
-    {
-      type: 'pillar',
-      id: 'wwd-point-2',
       num: '01',
       total: '05',
       title: 'VISION',
@@ -34,8 +18,6 @@ export default function WhatWeDo() {
       desc: 'Defining market dominance, high-status category positioning, and strategic growth opportunity identification.'
     },
     {
-      type: 'pillar',
-      id: 'wwd-point-3',
       num: '02',
       total: '05',
       title: 'STRATEGY',
@@ -43,8 +25,6 @@ export default function WhatWeDo() {
       desc: 'Algorithmic capital allocation models built around strict CPA targets, LTV expansion, and ROAS sustainability.'
     },
     {
-      type: 'pillar',
-      id: 'wwd-point-4',
       num: '03',
       total: '05',
       title: 'CREATIVE',
@@ -52,8 +32,6 @@ export default function WhatWeDo() {
       desc: 'Cinematic fashion-film visual direction combined with high-impact VSL scriptwriting and ad creative iterations.'
     },
     {
-      type: 'pillar',
-      id: 'wwd-point-5',
       num: '04',
       total: '05',
       title: 'ACQUISITION',
@@ -61,8 +39,6 @@ export default function WhatWeDo() {
       desc: 'High-scale ad buying infrastructure across Meta, Google, and TikTok to acquire qualified cold traffic.'
     },
     {
-      type: 'pillar-last',
-      id: 'wwd-point-6',
       num: '05',
       total: '05',
       title: 'CONVERSION',
@@ -80,49 +56,46 @@ export default function WhatWeDo() {
   ];
 
   useEffect(() => {
-    const DEBUG = isDebugMode();
+    const triggerEl = triggerRef.current;
+    const trackEl = trackRef.current;
+    if (!triggerEl || !trackEl) return;
+
     const mm = gsap.matchMedia();
 
     mm.add(
       {
-        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
-        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
-        isReduced: '(prefers-reduced-motion: reduce)'
+        isDesktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)',
+        isMobile: '(max-width: 767px), (prefers-reduced-motion: reduce)'
       },
       (context) => {
-        const { isDesktop, isReduced } = context.conditions;
+        const { isDesktop } = context.conditions;
 
-        pointRefs.current.forEach((pointEl, idx) => {
-          if (!pointEl) return;
-          const isLast = idx === pointRefs.current.length - 1;
-          const isFullHeight = pointEl.offsetHeight >= window.innerHeight * 0.75;
-          const shouldHitch = isDesktop && !isLast && isFullHeight && !isReduced;
-
-          const animateEntrance = () => {
-            gsap.fromTo(
-              pointEl,
-              { opacity: 0, y: 40 },
-              { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
-            );
+        if (isDesktop) {
+          const getScrollDistance = () => {
+            const trackWidth = trackEl.scrollWidth;
+            const viewportWidth = window.innerWidth;
+            return Math.max(0, trackWidth - viewportWidth);
           };
 
-          if (shouldHitch) {
-            createHitchTrigger({
-              sectionEl: pointEl,
-              sectionName: `WhatWeDo-Point-${idx}`,
-              holdDurationMs: 500, // Short controlled 0.5s pause per point
-              onAnimate: animateEntrance
-            });
-          } else {
-            ScrollTrigger.create({
-              trigger: pointEl,
-              start: 'top 80%',
-              markers: DEBUG,
+          gsap.to(trackEl, {
+            x: () => -getScrollDistance(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: triggerEl,
+              start: 'top top',
+              end: () => `+=${getScrollDistance()}`,
+              pin: true,
+              pinSpacing: true,
+              scrub: true,
               invalidateOnRefresh: true,
-              onEnter: animateEntrance
-            });
-          }
-        });
+              onRefresh: () => {
+                if (window.lenis) {
+                  window.lenis.resize();
+                }
+              }
+            }
+          });
+        }
       }
     );
 
@@ -131,27 +104,41 @@ export default function WhatWeDo() {
 
   return (
     <section
-      ref={containerRef}
+      ref={triggerRef}
       id="what-we-do-section"
       style={{
         position: 'relative',
         width: '100%',
         maxWidth: '100vw',
+        height: '100vh',
+        minHeight: '100svh',
+        overflow: 'hidden',
         backgroundColor: '#0F1017',
         color: '#FFFFFF',
         margin: 0,
         padding: 0
       }}
     >
-      <div className="wwd-points-container" style={{ width: '100%' }}>
-        {/* POINT 0: WHAT WE DO HERO IMAGE */}
+      <div
+        ref={trackRef}
+        className="horizontal-scroll-track"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'nowrap',
+          height: '100vh',
+          alignItems: 'center',
+          willChange: 'transform',
+          width: 'max-content',
+          margin: 0
+        }}
+      >
+        {/* PANEL 01: WHAT WE DO HERO IMAGE */}
         <div
-          ref={(el) => (pointRefs.current[0] = el)}
-          id={pointsData[0].id}
-          className="wwd-point"
+          className="system-scene-panel"
           style={{
+            flex: '0 0 100vw',
             width: '100vw',
-            minHeight: '100svh',
             height: '100vh',
             position: 'relative',
             overflow: 'hidden',
@@ -159,15 +146,12 @@ export default function WhatWeDo() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxSizing: 'border-box',
-            opacity: 0,
-            transform: 'translateY(40px)',
-            willChange: 'transform, opacity'
+            boxSizing: 'border-box'
           }}
         >
           <img
-            src={pointsData[0].imgSrc}
-            alt={pointsData[0].alt}
+            src="/images/what-we-do-hero.jpg"
+            alt="WHAT WE DO — Manifest Tech Media"
             style={{
               width: '100%',
               height: '100%',
@@ -179,23 +163,18 @@ export default function WhatWeDo() {
           />
         </div>
 
-        {/* POINT 1: THE SYSTEM INTRO */}
+        {/* PANEL 02: THE SYSTEM INTRO */}
         <div
-          ref={(el) => (pointRefs.current[1] = el)}
-          id={pointsData[1].id}
-          className="wwd-point"
+          className="system-scene-panel"
           style={{
-            width: '100%',
-            minHeight: '100svh',
+            flex: '0 0 100vw',
+            width: '100vw',
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '120px clamp(2rem, 8vw, 10rem)',
-            boxSizing: 'border-box',
-            opacity: 0,
-            transform: 'translateY(40px)',
-            willChange: 'transform, opacity'
+            padding: '0 clamp(2rem, 8vw, 10rem)',
+            boxSizing: 'border-box'
           }}
         >
           <span
@@ -210,7 +189,7 @@ export default function WhatWeDo() {
               marginBottom: '1.5rem'
             }}
           >
-            {pointsData[1].badge}
+            — THE SYSTEM
           </span>
           <h2
             style={{
@@ -225,7 +204,7 @@ export default function WhatWeDo() {
               margin: '0 0 2rem 0'
             }}
           >
-            {pointsData[1].title}
+            WE TURN AD SPEND INTO REVENUE SYSTEMS.
           </h2>
           <p
             style={{
@@ -237,30 +216,25 @@ export default function WhatWeDo() {
               margin: 0
             }}
           >
-            {pointsData[1].desc}
+            A continuous architecture engineered to align brand authority, media acquisition, and unit economics into scalable enterprise growth.
           </p>
         </div>
 
-        {/* POINTS 2-5: PILLARS 01-04 */}
-        {pointsData.slice(2, 6).map((pillar, idx) => (
+        {/* PANELS 03-07: THE 5 PILLARS */}
+        {pillars.map((pillar) => (
           <div
-            key={pillar.id}
-            ref={(el) => (pointRefs.current[idx + 2] = el)}
-            id={pillar.id}
-            className="wwd-point"
+            key={pillar.num}
+            className="system-scene-panel"
             style={{
-              width: '100%',
-              minHeight: '100svh',
+              flex: '0 0 100vw',
+              width: '100vw',
               height: '100vh',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              padding: '120px clamp(2rem, 10vw, 12rem)',
+              padding: '0 clamp(2rem, 10vw, 12rem)',
               boxSizing: 'border-box',
-              position: 'relative',
-              opacity: 0,
-              transform: 'translateY(40px)',
-              willChange: 'transform, opacity'
+              position: 'relative'
             }}
           >
             <div
@@ -334,23 +308,18 @@ export default function WhatWeDo() {
           </div>
         ))}
 
-        {/* POINT 6: PILLAR 05 + REVENUE STAGES (LAST POINT - NO HITCH) */}
+        {/* PANEL 08: THE REVENUE SYSTEM PROGRESSIVE FLOW + CTA */}
         <div
-          ref={(el) => (pointRefs.current[6] = el)}
-          id={pointsData[6].id}
-          className="wwd-point"
+          className="system-scene-panel"
           style={{
-            width: '100%',
-            minHeight: '100svh',
+            flex: '0 0 100vw',
+            width: '100vw',
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '120px clamp(2rem, 8vw, 10rem)',
-            boxSizing: 'border-box',
-            opacity: 0,
-            transform: 'translateY(40px)',
-            willChange: 'transform, opacity'
+            padding: '0 clamp(2rem, 8vw, 10rem)',
+            boxSizing: 'border-box'
           }}
         >
           <span
@@ -461,6 +430,27 @@ export default function WhatWeDo() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 767px) {
+          #what-we-do-section {
+            height: auto !important;
+            overflow: visible !important;
+          }
+          .horizontal-scroll-track {
+            flex-direction: column !important;
+            width: 100% !important;
+            height: auto !important;
+            transform: none !important;
+          }
+          .system-scene-panel {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 80vh !important;
+            padding: 5rem 1.5rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

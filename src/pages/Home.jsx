@@ -95,6 +95,8 @@ export default function Home({ sequenceState }) {
         window.lenis.resize();
       }
       ScrollTrigger.refresh();
+      const pinnedTriggers = ScrollTrigger.getAll().filter((tr) => tr.pin);
+      console.log('Pinned ScrollTriggers (Allowlist Validation):', pinnedTriggers);
     }, 100);
     return () => clearTimeout(t);
   }, [phase, unlockScroll]);
