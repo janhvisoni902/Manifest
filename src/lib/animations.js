@@ -1,35 +1,45 @@
 import gsap from 'gsap';
 
 /**
- * Shared entrance animation function for MTM and Hello sections.
- * Animates opacity 0 -> 1, y: 40 -> 0, duration: 0.7s, ease: power3.out, stagger: 0.15s.
- * For reduced motion, performs opacity-only fade without vertical movement.
+ * Shared entrance animation helper for MTM and Hello sections.
+ * Animates opacity (0 -> 1) and y-translation (30px -> 0px) using power3.out.
  */
-export function playEntrance(containerEl, options = {}) {
-  if (!containerEl) return null;
-
+export function playIntro(el, options = {}) {
+  if (!el) return null;
   const isReduced =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const targets = containerEl.querySelectorAll('.animate-item, h1, h2, h3, p, button, .stat-item');
-  const items = targets && targets.length > 0 ? Array.from(targets) : [containerEl];
-
-  const tl = gsap.timeline(options);
+  const targets = el.querySelectorAll
+    ? el.querySelectorAll('.animate-item, h1, h2, p, span, button, a')
+    : [el];
+  const items = targets.length > 0 ? Array.from(targets) : [el];
 
   if (isReduced) {
-    tl.fromTo(
+    return gsap.fromTo(
       items,
       { opacity: 0 },
-      { opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' }
-    );
-  } else {
-    tl.fromTo(
-      items,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.15 }
+      {
+        opacity: 1,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'power2.out',
+        onComplete: options.onComplete
+      }
     );
   }
 
-  return tl;
+  return gsap.fromTo(
+    items,
+    { y: 30, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      delay: options.delay || 0,
+      onComplete: options.onComplete
+    }
+  );
 }

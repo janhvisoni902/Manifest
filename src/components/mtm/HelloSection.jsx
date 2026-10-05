@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { playEntrance } from '../../lib/animations';
+import { playIntro } from '../../lib/animations';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,12 +11,14 @@ const isDebugMode = () =>
 
 export default function HelloSection() {
   const sectionRef = useRef(null);
-  const contentRef = useRef(null);
+  const containerRef = useRef(null);
+  const headlineRef = useRef(null);
+  const statementRef = useRef(null);
 
   useEffect(() => {
     const el = sectionRef.current;
-    const content = contentRef.current;
-    if (!el || !content) return;
+    const container = containerRef.current;
+    if (!el || !container) return;
 
     const DEBUG = isDebugMode();
     const mm = gsap.matchMedia();
@@ -28,43 +30,49 @@ export default function HelloSection() {
         isReduced: '(prefers-reduced-motion: reduce)'
       },
       (context) => {
-        const { isDesktop, isMobile, isReduced } = context.conditions;
+        const { isDesktop, isReduced } = context.conditions;
         if (isReduced) {
-          playEntrance(content);
+          playIntro(container);
           return;
         }
 
-        // 1. Bottom-to-top Entrance triggered when Hello reaches viewport
-        ScrollTrigger.create({
-          trigger: el,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
-          onEnter: () => playEntrance(content),
-          markers: DEBUG
-        });
+        if (isDesktop) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: el,
+              start: 'top top',
+              end: '+=60%',
+              pin: true,
+              pinSpacing: true,
+              scrub: 0.5,
+              markers: DEBUG,
+              invalidateOnRefresh: true,
+              onEnter: () => {
+                playIntro(container);
+              }
+            }
+          });
 
-        // 2. Short visual hold pin
-        const holdEnd = isDesktop ? '+=40%' : isMobile ? '+=25%' : '+=25%';
-
-        const holdTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: el,
-            start: 'top top',
-            end: holdEnd,
-            pin: true,
-            pinSpacing: true,
-            scrub: 0.5,
-            markers: DEBUG,
-            invalidateOnRefresh: true
-          }
-        });
-
-        holdTl.to(content, {
-          scale: 0.98,
-          opacity: 0.9,
-          duration: 0.2,
-          ease: 'power1.inOut'
-        });
+          tl.to(container, {
+            scale: 0.97,
+            opacity: 0.88,
+            duration: 0.3,
+            ease: 'power1.inOut'
+          });
+        } else {
+          // Mobile: ScrollTrigger entrance on viewport reach
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 75%',
+              toggleActions: 'play none none reverse',
+              markers: DEBUG,
+              onEnter: () => {
+                playIntro(container);
+              }
+            }
+          });
+        }
       }
     );
 
@@ -90,12 +98,12 @@ export default function HelloSection() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: '140px 2.5rem 160px',
+        padding: '120px 2.5rem 140px',
         boxSizing: 'border-box'
       }}
     >
       <div
-        ref={contentRef}
+        ref={containerRef}
         className="container"
         style={{
           maxWidth: '1240px',
@@ -104,8 +112,9 @@ export default function HelloSection() {
           willChange: 'transform, opacity'
         }}
       >
-        {/* 1. Large Editorial Headline - h2 to ensure only single H1 on page */}
+        {/* 1. Large Editorial Headline (h2 for accessibility compliance since MTM section holds the single h1) */}
         <h2
+          ref={headlineRef}
           className="animate-item"
           style={{
             fontFamily: 'var(--font-intro)',
@@ -118,7 +127,8 @@ export default function HelloSection() {
             margin: '0 0 3rem 0',
             maxWidth: '1000px',
             opacity: 0,
-            transform: 'translateY(40px)'
+            transform: 'translateY(30px)',
+            willChange: 'transform, opacity'
           }}
         >
           HELLO,<br />
@@ -128,6 +138,7 @@ export default function HelloSection() {
 
         {/* 2. Statement */}
         <p
+          ref={statementRef}
           className="animate-item"
           style={{
             fontSize: 'clamp(1.3rem, 2.4vw, 2.2rem)',
@@ -138,7 +149,8 @@ export default function HelloSection() {
             maxWidth: '860px',
             margin: 0,
             opacity: 0,
-            transform: 'translateY(40px)'
+            transform: 'translateY(30px)',
+            willChange: 'transform, opacity'
           }}
         >
           We help global brands turn paid traffic into predictable, scalable revenue — aligning every dollar with real backend growth.

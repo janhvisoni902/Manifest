@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { playEntrance } from '../../lib/animations';
+import { playIntro } from '../../lib/animations';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,8 +12,10 @@ const isDebugMode = () =>
 export default function MTMSection({ sequenceState }) {
   const sectionRef = useRef(null);
   const contentRef = useRef(null);
+  const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
 
-  // 1. Entrance animation on page load (triggered when sequenceState === 'completed')
+  // 1. Entrance animation on page load (starts when sequenceState === 'completed')
   useEffect(() => {
     const el = sectionRef.current;
     const content = contentRef.current;
@@ -21,8 +23,9 @@ export default function MTMSection({ sequenceState }) {
 
     if (sequenceState !== 'completed') return;
 
-    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let fallbackTimer = null;
+    let hardTimeout = null;
 
     const unlock = () => {
       document.body.style.overflow = '';
@@ -33,12 +36,13 @@ export default function MTMSection({ sequenceState }) {
       ScrollTrigger.refresh();
     };
 
-    // Apply scroll lock during load entrance (max 1.5s) if motion allowed
+    // Apply scroll lock during load entrance (max ~1.5s, hard timeout 2s) if motion allowed
     if (!isReduced) {
       document.body.style.overflow = 'hidden';
       if (window.lenis) window.lenis.stop();
 
       fallbackTimer = setTimeout(unlock, 1500);
+      hardTimeout = setTimeout(unlock, 2000);
 
       const handleVisibilityChange = () => {
         if (document.hidden) unlock();
@@ -47,9 +51,10 @@ export default function MTMSection({ sequenceState }) {
       window.addEventListener('error', unlock);
 
       document.fonts.ready.then(() => {
-        playEntrance(content, {
+        playIntro(content, {
           onComplete: () => {
             clearTimeout(fallbackTimer);
+            clearTimeout(hardTimeout);
             unlock();
           }
         });
@@ -57,18 +62,19 @@ export default function MTMSection({ sequenceState }) {
 
       return () => {
         if (fallbackTimer) clearTimeout(fallbackTimer);
+        if (hardTimeout) clearTimeout(hardTimeout);
         window.removeEventListener('visibilitychange', handleVisibilityChange);
         window.removeEventListener('error', unlock);
         unlock();
       };
     } else {
       document.fonts.ready.then(() => {
-        playEntrance(content);
+        playIntro(content);
       });
     }
   }, [sequenceState]);
 
-  // 2. MTM Exit Animation as user scrolls from MTM to Hello
+  // 2. MTM Exit Scrub Animation as user scrolls from MTM to Hello
   // y: 0 -> -40, opacity: 1 -> 0.3, scrub: 0.5, trigger: top top -> bottom top
   useEffect(() => {
     const el = sectionRef.current;
@@ -109,162 +115,74 @@ export default function MTMSection({ sequenceState }) {
   return (
     <section
       ref={sectionRef}
-      id="mtm-hero-section"
+      id="mtm"
       style={{
         position: 'relative',
+        zIndex: 2,
+        width: '100%',
         minHeight: '100svh',
         height: '100vh',
-        width: '100%',
-        backgroundColor: '#0F1017',
-        color: '#FFFFFF',
+        backgroundColor: '#E9E9E9',
+        color: '#181818',
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
-        padding: '120px 2.5rem 60px',
+        padding: '0 2rem',
         boxSizing: 'border-box',
-        overflow: 'hidden',
-        zIndex: 1
+        overflow: 'hidden'
       }}
     >
-      {/* Background Subtle Gradient */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.05) 0%, rgba(15, 16, 23, 0) 70%)',
-          pointerEvents: 'none'
-        }}
-      />
-
       <div
         ref={contentRef}
-        className="container"
+        className="mtm-content-container"
         style={{
-          position: 'relative',
-          zIndex: 2,
-          maxWidth: '1280px',
+          textAlign: 'center',
+          maxWidth: '1200px',
           margin: '0 auto',
-          width: '100%',
           willChange: 'transform, opacity'
         }}
       >
-        {/* Eyebrow Badge */}
-        <div
-          className="animate-item"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '8px 18px',
-            borderRadius: '9999px',
-            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            marginBottom: '2rem',
-            opacity: 0,
-            transform: 'translateY(40px)'
-          }}
-        >
-          <span
-            style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
-            }}
-          />
-          <span
-            style={{
-              fontFamily: 'var(--font-mono, monospace)',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.85)'
-            }}
-          >
-            MANIFEST TECH MEDIA · REVENUE ENGINEERING
-          </span>
-        </div>
-
-        {/* Sole H1 on Page */}
+        {/* Single Page H1 for Accessibility & SEO */}
         <h1
+          ref={titleRef}
           className="animate-item"
           style={{
             fontFamily: 'var(--font-intro, sans-serif)',
-            fontSize: 'clamp(3rem, 7.5vw, 6.8rem)',
+            fontSize: 'clamp(3.5rem, 9vw, 8rem)',
             fontWeight: 900,
-            lineHeight: 1.02,
             letterSpacing: '-0.04em',
-            marginBottom: '1.8rem',
-            color: '#FFFFFF',
-            maxWidth: '1100px',
+            lineHeight: 0.92,
+            color: '#181818',
             textTransform: 'uppercase',
+            margin: '0 0 1.5rem 0',
             opacity: 0,
-            transform: 'translateY(40px)'
+            transform: 'translateY(30px)',
+            willChange: 'transform, opacity'
           }}
         >
-          YOUR NEXT $10M IS A SYSTEM PROBLEM.
+          MANIFEST<br />
+          TECH MEDIA
         </h1>
 
-        {/* Subhead */}
         <p
+          ref={subtitleRef}
           className="animate-item"
           style={{
-            fontFamily: 'var(--font-body, sans-serif)',
-            fontSize: 'clamp(1.1rem, 1.8vw, 1.4rem)',
-            lineHeight: 1.6,
-            color: 'rgba(255, 255, 255, 0.75)',
-            maxWidth: '780px',
-            marginBottom: '2.5rem',
-            fontWeight: 400,
+            fontFamily: 'var(--font-mono, monospace)',
+            fontSize: 'clamp(0.85rem, 1.4vw, 1.1rem)',
+            fontWeight: 700,
+            letterSpacing: '0.22em',
+            color: 'rgba(24, 24, 24, 0.65)',
+            textTransform: 'uppercase',
+            margin: 0,
             opacity: 0,
-            transform: 'translateY(40px)'
+            transform: 'translateY(30px)',
+            willChange: 'transform, opacity'
           }}
         >
-          We turn paid traffic into predictable, scalable revenue — aligning every ad dollar with real backend growth.
+          REVENUE ARCHITECTURE · ENTERPRISE GROWTH ENGINES
         </p>
-
-        {/* Stat Row */}
-        <div
-          className="animate-item"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '2rem',
-            paddingTop: '2.5rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.12)',
-            opacity: 0,
-            transform: 'translateY(40px)'
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: 1 }}>
-              $200M+
-            </div>
-            <div style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255, 255, 255, 0.55)', marginTop: '6px' }}>
-              Total Ad Spend Managed
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: 1 }}>
-              400+
-            </div>
-            <div style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255, 255, 255, 0.55)', marginTop: '6px' }}>
-              US Businesses Transformed
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: 1 }}>
-              8+
-            </div>
-            <div style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255, 255, 255, 0.55)', marginTop: '6px' }}>
-              Industries Scaled
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

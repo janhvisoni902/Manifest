@@ -99,8 +99,10 @@ export default function WhatWeDo() {
         pointRefs.current.forEach((pointEl, idx) => {
           if (!pointEl) return;
           const isLast = idx === pointRefs.current.length - 1;
+          const isFullHeight = pointEl.offsetHeight >= window.innerHeight * 0.75;
+          const shouldHoldPin = isDesktop && !isLast && isFullHeight;
 
-          // Trigger 1: Entrance (top 80%, no pin, toggleActions: play none none reverse)
+          // 1. Entrance Trigger: top 80%, no pin, opacity 0->1, y 40->0, 0.6s, power3.out
           gsap.fromTo(
             pointEl,
             { opacity: 0, y: 40 },
@@ -113,18 +115,18 @@ export default function WhatWeDo() {
                 trigger: pointEl,
                 start: 'top 80%',
                 toggleActions: 'play none none reverse',
-                markers: DEBUG
+                markers: DEBUG,
+                invalidateOnRefresh: true
               }
             }
           );
 
-          // Trigger 2: Hold (center center, end: +=22%, pin: true, no scrub)
-          // Applied only on Desktop (≥1024px) to full-height non-last points.
-          if (isDesktop && !isLast) {
+          // 2. Hold Trigger: center center, end +=25%, pin true, no scrub (if full height desktop & not last point)
+          if (shouldHoldPin) {
             ScrollTrigger.create({
               trigger: pointEl,
               start: 'center center',
-              end: '+=22%',
+              end: '+=25%',
               pin: true,
               pinSpacing: true,
               scrub: false,
@@ -174,6 +176,8 @@ export default function WhatWeDo() {
             alignItems: 'center',
             justifyContent: 'center',
             boxSizing: 'border-box',
+            opacity: 0,
+            transform: 'translateY(40px)',
             willChange: 'transform, opacity'
           }}
         >
@@ -205,6 +209,8 @@ export default function WhatWeDo() {
             justifyContent: 'center',
             padding: '120px clamp(2rem, 8vw, 10rem)',
             boxSizing: 'border-box',
+            opacity: 0,
+            transform: 'translateY(40px)',
             willChange: 'transform, opacity'
           }}
         >
@@ -268,6 +274,8 @@ export default function WhatWeDo() {
               padding: '120px clamp(2rem, 10vw, 12rem)',
               boxSizing: 'border-box',
               position: 'relative',
+              opacity: 0,
+              transform: 'translateY(40px)',
               willChange: 'transform, opacity'
             }}
           >
@@ -350,11 +358,14 @@ export default function WhatWeDo() {
           style={{
             width: '100%',
             minHeight: '100svh',
+            height: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             padding: '120px clamp(2rem, 8vw, 10rem)',
             boxSizing: 'border-box',
+            opacity: 0,
+            transform: 'translateY(40px)',
             willChange: 'transform, opacity'
           }}
         >
