@@ -3,6 +3,7 @@ import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import { gsap, ScrollTrigger } from './lib/gsap';
 import { RouterProvider, useRouter } from './lib/router';
+import { initGlobalRefreshListeners } from './lib/refresh';
 
 // Navigation & Structure
 import Intro from './components/Intro';
@@ -71,7 +72,10 @@ function AppContent() {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    const cleanupRefresh = initGlobalRefreshListeners();
+
     return () => {
+      cleanupRefresh();
       lenis.destroy();
       gsap.ticker.remove(tick);
       window.lenis = null;

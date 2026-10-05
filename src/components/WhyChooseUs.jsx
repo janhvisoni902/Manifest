@@ -3,12 +3,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from '../lib/router';
 import { contactInfo } from '../data/contact';
+import { createHitchTrigger, isDebugMode } from '../lib/hitch';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const isDebugMode = () =>
-  typeof window !== 'undefined' &&
-  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
 
 export default function WhyChooseUs() {
   const sectionRef = useRef(null);
@@ -66,115 +63,55 @@ export default function WhyChooseUs() {
       },
       (context) => {
         const { isDesktop, isReduced } = context.conditions;
-        if (isReduced) return;
+
+        const animateContent = () => {
+          if (heroRef.current) {
+            gsap.fromTo(
+              heroRef.current.children,
+              { y: 35, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out' }
+            );
+          }
+          if (cardsRef.current) {
+            gsap.fromTo(
+              cardsRef.current.children,
+              { y: 40, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+            );
+          }
+          if (ctaRef.current) {
+            gsap.fromTo(
+              ctaRef.current.children,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+            );
+          }
+        };
+
+        if (isReduced) {
+          animateContent();
+          return;
+        }
 
         if (isDesktop) {
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: el,
-              start: 'top top',
-              end: '+=50%',
-              pin: true,
-              pinSpacing: true,
-              scrub: 0.5,
-              markers: DEBUG,
-              invalidateOnRefresh: true
-            }
+          createHitchTrigger({
+            sectionEl: el,
+            sectionName: 'WhyChooseUs',
+            holdDurationMs: 800,
+            onAnimate: animateContent
           });
-
-          if (heroRef.current) {
-            tl.fromTo(
-              heroRef.current.children,
-              { y: 35, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
-            );
-          }
-
-          if (cardsRef.current) {
-            tl.fromTo(
-              cardsRef.current.children,
-              { y: 40, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: 'power2.out' },
-              '-=0.2'
-            );
-          }
-
-          if (ctaRef.current) {
-            tl.fromTo(
-              ctaRef.current.children,
-              { y: 30, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' },
-              '-=0.2'
-            );
-          }
         } else {
-          // Mobile / tablet reveal
-          if (heroRef.current) {
-            gsap.fromTo(
-              heroRef.current.children,
-              { y: 35, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.8,
-                stagger: 0.15,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: heroRef.current,
-                  start: 'top 80%',
-                  toggleActions: 'play none none reverse',
-                  markers: DEBUG
-                }
-              }
-            );
-          }
-
-          if (cardsRef.current) {
-            gsap.fromTo(
-              cardsRef.current.children,
-              { y: 40, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.8,
-                stagger: 0.15,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: cardsRef.current,
-                  start: 'top 75%',
-                  toggleActions: 'play none none reverse',
-                  markers: DEBUG
-                }
-              }
-            );
-          }
-
-          if (ctaRef.current) {
-            gsap.fromTo(
-              ctaRef.current.children,
-              { y: 30, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.8,
-                stagger: 0.15,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: ctaRef.current,
-                  start: 'top 85%',
-                  toggleActions: 'play none none reverse',
-                  markers: DEBUG
-                }
-              }
-            );
-          }
+          // Mobile: ScrollTrigger entrance reveal only
+          ScrollTrigger.create({
+            trigger: el,
+            start: 'top 75%',
+            markers: DEBUG,
+            invalidateOnRefresh: true,
+            onEnter: animateContent
+          });
         }
       }
     );
-
-    document.fonts.ready.then(() => {
-      ScrollTrigger.refresh();
-    });
 
     return () => mm.revert();
   }, []);
@@ -194,7 +131,7 @@ export default function WhyChooseUs() {
       }}
     >
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        {/* 03 — HERO */}
+        {/* HERO */}
         <div ref={heroRef} style={{ marginBottom: '5rem', willChange: 'transform, opacity' }}>
           <h2
             style={{
@@ -224,7 +161,7 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        {/* 04 & 05 — FOUR SMALL CARDS IN ONE ROW */}
+        {/* FOUR CARDS GRID */}
         <div
           ref={cardsRef}
           className="why-choose-us-grid"
@@ -333,7 +270,7 @@ export default function WhyChooseUs() {
           ))}
         </div>
 
-        {/* 06 — BOTTOM CTA */}
+        {/* BOTTOM CTA */}
         <div
           ref={ctaRef}
           style={{

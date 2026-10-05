@@ -5,12 +5,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
 import { contactInfo } from '../data/contact';
+import { createHitchTrigger, isDebugMode } from '../lib/hitch';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const isDebugMode = () =>
-  typeof window !== 'undefined' &&
-  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
 
 export default function WhoWeWorkWith() {
   const { navigate } = useRouter();
@@ -51,7 +48,7 @@ export default function WhoWeWorkWith() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // ScrollTrigger timeline using gsap.matchMedia
+  // Hitch setup using createHitchTrigger
   useEffect(() => {
     const sectionEl = sectionRef.current;
     if (!sectionEl) return;
@@ -67,97 +64,60 @@ export default function WhoWeWorkWith() {
       },
       (context) => {
         const { isDesktop, isReduced } = context.conditions;
-        if (isReduced) return;
 
-        const cards = floatingLayerRef.current
-          ? Array.from(floatingLayerRef.current.children)
-          : [];
+        const animateContent = () => {
+          const cards = floatingLayerRef.current
+            ? Array.from(floatingLayerRef.current.children)
+            : [];
+
+          if (centerRef.current) {
+            gsap.fromTo(
+              centerRef.current,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
+            );
+          }
+
+          if (cards.length > 0) {
+            gsap.fromTo(
+              cards,
+              { scale: 0.85, opacity: 0, y: 25 },
+              {
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                stagger: 0.12,
+                ease: 'power3.out'
+              }
+            );
+          }
+        };
+
+        if (isReduced) {
+          animateContent();
+          return;
+        }
 
         if (isDesktop) {
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: sectionEl,
-              start: 'top top',
-              end: '+=50%',
-              pin: true,
-              pinSpacing: true,
-              scrub: 0.5,
-              markers: DEBUG,
-              invalidateOnRefresh: true
-            }
+          createHitchTrigger({
+            sectionEl: sectionEl,
+            sectionName: 'WhoWeWorkWith',
+            holdDurationMs: 800,
+            onAnimate: animateContent
           });
-
-          if (centerRef.current) {
-            tl.fromTo(
-              centerRef.current,
-              { y: 30, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
-            );
-          }
-
-          if (cards.length > 0) {
-            tl.fromTo(
-              cards,
-              { scale: 0.8, opacity: 0, y: 30 },
-              {
-                scale: 1,
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                stagger: 0.12,
-                ease: 'power2.out'
-              },
-              '-=0.2'
-            );
-          }
         } else {
-          // Mobile / Tablet reveal
-          if (centerRef.current) {
-            gsap.fromTo(
-              centerRef.current,
-              { y: 30, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.8,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: centerRef.current,
-                  start: 'top 80%',
-                  toggleActions: 'play none none reverse',
-                  markers: DEBUG
-                }
-              }
-            );
-          }
-
-          if (cards.length > 0) {
-            gsap.fromTo(
-              cards,
-              { scale: 0.9, opacity: 0, y: 20 },
-              {
-                scale: 1,
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: sectionEl,
-                  start: 'top 70%',
-                  toggleActions: 'play none none reverse',
-                  markers: DEBUG
-                }
-              }
-            );
-          }
+          // Mobile: ScrollTrigger entrance reveal only
+          ScrollTrigger.create({
+            trigger: sectionEl,
+            start: 'top 75%',
+            markers: DEBUG,
+            invalidateOnRefresh: true,
+            onEnter: animateContent
+          });
         }
       }
     );
-
-    document.fonts.ready.then(() => {
-      ScrollTrigger.refresh();
-    });
 
     return () => mm.revert();
   }, []);

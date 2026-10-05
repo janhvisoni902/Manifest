@@ -2,12 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from '../../lib/router';
+import { createHitchTrigger, isDebugMode } from '../../lib/hitch';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const isDebugMode = () =>
-  typeof window !== 'undefined' &&
-  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
 
 export default function WhatWeDo() {
   const containerRef = useRef(null);
@@ -94,53 +91,40 @@ export default function WhatWeDo() {
       },
       (context) => {
         const { isDesktop, isReduced } = context.conditions;
-        if (isReduced) return;
 
         pointRefs.current.forEach((pointEl, idx) => {
           if (!pointEl) return;
           const isLast = idx === pointRefs.current.length - 1;
           const isFullHeight = pointEl.offsetHeight >= window.innerHeight * 0.75;
-          const shouldHoldPin = isDesktop && !isLast && isFullHeight;
+          const shouldHitch = isDesktop && !isLast && isFullHeight && !isReduced;
 
-          // 1. Entrance Trigger: top 80%, no pin, opacity 0->1, y 40->0, 0.6s, power3.out
-          gsap.fromTo(
-            pointEl,
-            { opacity: 0, y: 40 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: pointEl,
-                start: 'top 80%',
-                toggleActions: 'play none none reverse',
-                markers: DEBUG,
-                invalidateOnRefresh: true
-              }
-            }
-          );
+          const animateEntrance = () => {
+            gsap.fromTo(
+              pointEl,
+              { opacity: 0, y: 40 },
+              { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+            );
+          };
 
-          // 2. Hold Trigger: center center, end +=25%, pin true, no scrub (if full height desktop & not last point)
-          if (shouldHoldPin) {
+          if (shouldHitch) {
+            createHitchTrigger({
+              sectionEl: pointEl,
+              sectionName: `WhatWeDo-Point-${idx}`,
+              holdDurationMs: 500, // Short controlled 0.5s pause per point
+              onAnimate: animateEntrance
+            });
+          } else {
             ScrollTrigger.create({
               trigger: pointEl,
-              start: 'center center',
-              end: '+=25%',
-              pin: true,
-              pinSpacing: true,
-              scrub: false,
+              start: 'top 80%',
               markers: DEBUG,
-              invalidateOnRefresh: true
+              invalidateOnRefresh: true,
+              onEnter: animateEntrance
             });
           }
         });
       }
     );
-
-    document.fonts.ready.then(() => {
-      ScrollTrigger.refresh();
-    });
 
     return () => mm.revert();
   }, []);
@@ -350,7 +334,7 @@ export default function WhatWeDo() {
           </div>
         ))}
 
-        {/* POINT 6: PILLAR 05 + REVENUE STAGES (LAST POINT - NO PIN) */}
+        {/* POINT 6: PILLAR 05 + REVENUE STAGES (LAST POINT - NO HITCH) */}
         <div
           ref={(el) => (pointRefs.current[6] = el)}
           id={pointsData[6].id}
