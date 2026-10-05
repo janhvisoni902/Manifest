@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useRouter } from '../lib/router';
+import { contactInfo } from '../data/contact';
 
 export default function Footer() {
   const { pathname } = useRouter();
@@ -97,7 +98,7 @@ export default function Footer() {
               Ready to build your revenue engine?
             </p>
             <Link
-              href="/contact"
+              href={`mailto:${contactInfo.email}`}
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.8rem',

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from '../lib/router';
 import { getIndustryBySlug } from '../data/manifestIndustriesData';
+import { contactInfo } from '../data/contact';
 
 export default function IndustryDetailPage({ slug }) {
   const industry = getIndustryBySlug(slug);
@@ -329,7 +330,7 @@ export default function IndustryDetailPage({ slug }) {
           </p>
 
           <Link
-            href="/contact"
+            href={`mailto:${contactInfo.email}`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

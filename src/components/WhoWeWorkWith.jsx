@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
+import { contactInfo } from '../data/contact';
 
 export default function WhoWeWorkWith() {
   const { navigate } = useRouter();
@@ -131,7 +132,7 @@ export default function WhoWeWorkWith() {
           </p>
 
           <Link
-            href="/contact"
+            href={`mailto:${contactInfo.email}`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

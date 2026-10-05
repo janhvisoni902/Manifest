@@ -11,17 +11,7 @@ import VideoReveal from './components/VideoReveal';
 
 // Pages
 import Home from './pages/Home';
-import AboutUs from './pages/AboutUs';
-import ServicesPage from './pages/ServicesPage';
-import OurWorkPage from './pages/OurWorkPage';
 import CaseStudiesPage from './pages/CaseStudiesPage';
-import IndustriesPage from './pages/IndustriesPage';
-import ClientsPage from './pages/ClientsPage';
-import BlogPage from './pages/BlogPage';
-import MediaPRPage from './pages/MediaPRPage';
-import ContactPage from './pages/ContactPage';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import TermsPage from './pages/TermsPage';
 import SystemPage from './pages/SystemPage';
 import FoundersPage from './pages/FoundersPage';
 
@@ -160,10 +150,6 @@ function AppContent() {
   };
 
   const renderActivePage = (path) => {
-    if (path === '/insights' || path === '/blog' || path.startsWith('/insights/') || path.startsWith('/blog/')) {
-      return <BlogPage />;
-    }
-
     if (path.startsWith('/industries/') && path !== '/industries/') {
       const slug = path.replace('/industries/', '');
       return <IndustryDetailPage slug={slug} />;
@@ -174,26 +160,8 @@ function AppContent() {
         return <SystemPage />;
       case '/founders':
         return <FoundersPage />;
-      case '/about':
-        return <AboutUs />;
-      case '/services':
-        return <ServicesPage />;
-      case '/work':
-        return <OurWorkPage />;
       case '/case-studies':
         return <CaseStudiesPage />;
-      case '/industries':
-        return <IndustriesPage />;
-      case '/clients':
-        return <ClientsPage />;
-      case '/media-pr':
-        return <MediaPRPage />;
-      case '/contact':
-        return <ContactPage />;
-      case '/privacy-policy':
-        return <PrivacyPolicyPage />;
-      case '/terms':
-        return <TermsPage />;
       case '/':
       default:
         return (

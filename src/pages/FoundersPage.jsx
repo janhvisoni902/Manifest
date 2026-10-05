@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import Footer from '../components/Footer';
-import { Link, useRouter } from '../lib/router';
+import { Link } from '../lib/router';
+import { contactInfo } from '../data/contact';
 
 export default function FoundersPage({ onScheduleCall }) {
-  const { navigate } = useRouter();
-  const handleCTA = onScheduleCall || (() => navigate('/contact'));
+  const handleCTA = onScheduleCall || (() => { window.location.href = `mailto:${contactInfo.email}`; });
 
   useEffect(() => {
     document.title = "Founders & Leadership | manifestTechmedia";

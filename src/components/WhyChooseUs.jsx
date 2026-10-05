@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from '../lib/router';
+import { contactInfo } from '../data/contact';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,7 +42,7 @@ export default function WhyChooseUs() {
       title: 'WHY US',
       desc: 'Strategy built around the whole business.',
       linkText: 'EXPLORE →',
-      href: '/about',
+      href: '/founders',
       imgSrc: '/frames/frame_0200.jpg'
     }
   ];
@@ -303,7 +304,7 @@ export default function WhyChooseUs() {
           </p>
 
           <Link
-            href="/contact"
+            href={`mailto:${contactInfo.email}`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
