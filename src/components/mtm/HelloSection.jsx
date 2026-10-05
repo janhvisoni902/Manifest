@@ -5,7 +5,7 @@ import { Link } from '../../lib/router';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function HelloSection() {
+export default function HelloSection({ immediate = false }) {
   const sectionRef = useRef(null);
   const headlineRef = useRef(null);
   const statementRef = useRef(null);
@@ -27,14 +27,20 @@ export default function HelloSection() {
         const { isMotionAllowed } = context.conditions;
 
         if (isMotionAllowed) {
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: el,
-              start: 'top 70%',
-              end: 'bottom 20%',
-              toggleActions: 'play none none reverse'
-            }
-          });
+          // `immediate`: section is rising over the angel video, so play on mount
+          // instead of waiting for a scroll position.
+          const tl = gsap.timeline(
+            immediate
+              ? { delay: 0.5 }
+              : {
+                  scrollTrigger: {
+                    trigger: el,
+                    start: 'top 70%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play none none reverse'
+                  }
+                }
+          );
 
           if (headlineRef.current) {
             tl.fromTo(
