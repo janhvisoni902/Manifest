@@ -164,7 +164,7 @@ export default function WhatWeDo() {
           }}
         >
           <img
-            src="/frames/frame_0295.jpg"
+            src="/images/what-we-do-hero.jpg"
             alt="WHAT WE DO — Manifest Tech Media"
             style={{
               width: '100%',

@@ -6,7 +6,6 @@ import HelloSection from '../components/mtm/HelloSection';
 import WhatWeDo from '../components/mtm/WhatWeDo';
 import WhyChooseUs from '../components/WhyChooseUs';
 import WhoWeWorkWith from '../components/WhoWeWorkWith';
-import LeadersSection from '../components/LeadersSection';
 import Footer from '../components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -144,10 +143,7 @@ export default function Home({ sequenceState }) {
           {/* 05: Who We Work With */}
           <WhoWeWorkWith />
 
-          {/* 06: Leaders */}
-          <LeadersSection />
-
-          {/* 07: Footer */}
+          {/* 06: Footer */}
           <Footer />
         </>
       )}
