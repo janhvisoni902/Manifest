@@ -5,12 +5,31 @@ import { Link } from '../../lib/router';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function WhatWeDo() {
-  const triggerRef = useRef(null);
-  const trackRef = useRef(null);
+const isDebugMode = () =>
+  typeof window !== 'undefined' &&
+  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
 
-  const pillars = [
+export default function WhatWeDo() {
+  const containerRef = useRef(null);
+  const pointRefs = useRef([]);
+
+  const pointsData = [
     {
+      type: 'hero',
+      id: 'wwd-point-0',
+      imgSrc: '/images/what-we-do-hero.jpg',
+      alt: 'WHAT WE DO — Manifest Tech Media'
+    },
+    {
+      type: 'intro',
+      id: 'wwd-point-1',
+      badge: '— THE SYSTEM',
+      title: 'WE TURN AD SPEND INTO REVENUE SYSTEMS.',
+      desc: 'A continuous architecture engineered to align brand authority, media acquisition, and unit economics into scalable enterprise growth.'
+    },
+    {
+      type: 'pillar',
+      id: 'wwd-point-2',
       num: '01',
       total: '05',
       title: 'VISION',
@@ -18,6 +37,8 @@ export default function WhatWeDo() {
       desc: 'Defining market dominance, high-status category positioning, and strategic growth opportunity identification.'
     },
     {
+      type: 'pillar',
+      id: 'wwd-point-3',
       num: '02',
       total: '05',
       title: 'STRATEGY',
@@ -25,6 +46,8 @@ export default function WhatWeDo() {
       desc: 'Algorithmic capital allocation models built around strict CPA targets, LTV expansion, and ROAS sustainability.'
     },
     {
+      type: 'pillar',
+      id: 'wwd-point-4',
       num: '03',
       total: '05',
       title: 'CREATIVE',
@@ -32,6 +55,8 @@ export default function WhatWeDo() {
       desc: 'Cinematic fashion-film visual direction combined with high-impact VSL scriptwriting and ad creative iterations.'
     },
     {
+      type: 'pillar',
+      id: 'wwd-point-5',
       num: '04',
       total: '05',
       title: 'ACQUISITION',
@@ -39,6 +64,8 @@ export default function WhatWeDo() {
       desc: 'High-scale ad buying infrastructure across Meta, Google, and TikTok to acquire qualified cold traffic.'
     },
     {
+      type: 'pillar-last',
+      id: 'wwd-point-6',
       num: '05',
       total: '05',
       title: 'CONVERSION',
@@ -56,116 +83,90 @@ export default function WhatWeDo() {
   ];
 
   useEffect(() => {
-    const triggerEl = triggerRef.current;
-    const trackEl = trackRef.current;
-    if (!triggerEl || !trackEl) return;
-
+    const DEBUG = isDebugMode();
     const mm = gsap.matchMedia();
 
     mm.add(
       {
-        isDesktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)',
-        isMobile: '(max-width: 767px), (prefers-reduced-motion: reduce)'
+        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
+        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
+        isReduced: '(prefers-reduced-motion: reduce)'
       },
       (context) => {
-        const { isDesktop } = context.conditions;
+        const { isDesktop, isReduced } = context.conditions;
+        if (isReduced) return;
 
-        if (isDesktop) {
-          const getScrollDistance = () => {
-            const trackWidth = trackEl.scrollWidth;
-            const viewportWidth = window.innerWidth;
-            return Math.max(0, trackWidth - viewportWidth);
-          };
+        pointRefs.current.forEach((pointEl, idx) => {
+          if (!pointEl) return;
+          const isLast = idx === pointRefs.current.length - 1;
+          const shouldPin = isDesktop && !isLast;
 
-          gsap.to(trackEl, {
-            x: () => -getScrollDistance(),
-            ease: 'none',
+          const tl = gsap.timeline({
             scrollTrigger: {
-              trigger: triggerEl,
-              start: 'top top',
-              end: () => `+=${getScrollDistance()}`,
-              pin: true,
-              pinSpacing: true,
-              scrub: true,
-              invalidateOnRefresh: true,
-              onRefresh: () => {
-                if (window.lenis) {
-                  window.lenis.resize();
-                }
-              }
+              trigger: pointEl,
+              start: 'top 65%',
+              end: shouldPin ? '+=18%' : 'top 20%',
+              pin: shouldPin ? pointEl : false,
+              pinSpacing: shouldPin,
+              scrub: shouldPin ? 0.5 : false,
+              toggleActions: shouldPin ? undefined : 'play none none reverse',
+              markers: DEBUG,
+              invalidateOnRefresh: true
             }
           });
-        }
+
+          tl.fromTo(
+            pointEl,
+            { opacity: 0, y: 40 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+          );
+        });
       }
     );
 
-    const handleResize = () => {
-      if (window.lenis) window.lenis.resize();
+    document.fonts.ready.then(() => {
       ScrollTrigger.refresh();
-    };
+    });
 
-    window.addEventListener('resize', handleResize);
-
-    const timer1 = setTimeout(handleResize, 150);
-    const timer2 = setTimeout(handleResize, 500);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      window.removeEventListener('resize', handleResize);
-      mm.revert();
-    };
+    return () => mm.revert();
   }, []);
 
   return (
     <section
-      ref={triggerRef}
+      ref={containerRef}
       id="what-we-do-section"
       style={{
         position: 'relative',
         width: '100%',
         maxWidth: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
         backgroundColor: '#0F1017',
         color: '#FFFFFF',
         margin: 0,
         padding: 0
       }}
     >
-      <div
-        ref={trackRef}
-        className="horizontal-scroll-track"
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'nowrap',
-          height: '100vh',
-          alignItems: 'center',
-          willChange: 'transform',
-          width: 'max-content',
-          margin: 0
-        }}
-      >
-        {/* PANEL 01: WHAT WE DO IMAGE (The Entry Point into Horizontal Journey) */}
+      <div className="wwd-points-container" style={{ width: '100%' }}>
+        {/* POINT 0: WHAT WE DO HERO IMAGE */}
         <div
-          className="system-scene-panel"
+          ref={(el) => (pointRefs.current[0] = el)}
+          id={pointsData[0].id}
+          className="wwd-point"
           style={{
-            flex: '0 0 100vw',
             width: '100vw',
-            height: '100vh',
+            minHeight: '100vh',
             position: 'relative',
             overflow: 'hidden',
             backgroundColor: '#0F1017',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            willChange: 'transform, opacity'
           }}
         >
           <img
-            src="/images/what-we-do-hero.jpg"
-            alt="WHAT WE DO — Manifest Tech Media"
+            src={pointsData[0].imgSrc}
+            alt={pointsData[0].alt}
             style={{
               width: '100%',
               height: '100%',
@@ -177,18 +178,20 @@ export default function WhatWeDo() {
           />
         </div>
 
-        {/* PANEL 02: — THE SYSTEM Intro Panel */}
+        {/* POINT 1: THE SYSTEM INTRO */}
         <div
-          className="system-scene-panel"
+          ref={(el) => (pointRefs.current[1] = el)}
+          id={pointsData[1].id}
+          className="wwd-point"
           style={{
-            flex: '0 0 100vw',
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '0 clamp(2rem, 8vw, 10rem)',
-            boxSizing: 'border-box'
+            padding: '120px clamp(2rem, 8vw, 10rem)',
+            boxSizing: 'border-box',
+            willChange: 'transform, opacity'
           }}
         >
           <span
@@ -203,7 +206,7 @@ export default function WhatWeDo() {
               marginBottom: '1.5rem'
             }}
           >
-            — THE SYSTEM
+            {pointsData[1].badge}
           </span>
           <h2
             style={{
@@ -218,7 +221,7 @@ export default function WhatWeDo() {
               margin: '0 0 2rem 0'
             }}
           >
-            WE TURN AD SPEND INTO REVENUE SYSTEMS.
+            {pointsData[1].title}
           </h2>
           <p
             style={{
@@ -230,25 +233,27 @@ export default function WhatWeDo() {
               margin: 0
             }}
           >
-            A continuous architecture engineered to align brand authority, media acquisition, and unit economics into scalable enterprise growth.
+            {pointsData[1].desc}
           </p>
         </div>
 
-        {/* PANELS 03-07: The 5 Pillars — Progressive Individual Screen Reveals */}
-        {pillars.map((pillar) => (
+        {/* POINTS 2-5: PILLARS 01-04 */}
+        {pointsData.slice(2, 6).map((pillar, idx) => (
           <div
-            key={pillar.num}
-            className="system-scene-panel"
+            key={pillar.id}
+            ref={(el) => (pointRefs.current[idx + 2] = el)}
+            id={pillar.id}
+            className="wwd-point"
             style={{
-              flex: '0 0 100vw',
-              width: '100vw',
-              height: '100vh',
+              width: '100%',
+              minHeight: '100vh',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              padding: '0 clamp(2rem, 10vw, 12rem)',
+              padding: '120px clamp(2rem, 10vw, 12rem)',
               boxSizing: 'border-box',
-              position: 'relative'
+              position: 'relative',
+              willChange: 'transform, opacity'
             }}
           >
             <div
@@ -322,18 +327,20 @@ export default function WhatWeDo() {
           </div>
         ))}
 
-        {/* PANEL 08: — THE REVENUE SYSTEM Progressive Flow + CTA */}
+        {/* POINT 6: PILLAR 05 + REVENUE STAGES (LAST POINT - NO PIN) */}
         <div
-          className="system-scene-panel"
+          ref={(el) => (pointRefs.current[6] = el)}
+          id={pointsData[6].id}
+          className="wwd-point"
           style={{
-            flex: '0 0 100vw',
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '0 clamp(2rem, 8vw, 10rem)',
-            boxSizing: 'border-box'
+            padding: '120px clamp(2rem, 8vw, 10rem)',
+            boxSizing: 'border-box',
+            willChange: 'transform, opacity'
           }}
         >
           <span
@@ -443,173 +450,7 @@ export default function WhatWeDo() {
             </Link>
           </div>
         </div>
-
-        {/* PANEL 09: — THE FOUNDERS Final Horizontal Panel */}
-        <div
-          className="system-scene-panel"
-          style={{
-            flex: '0 0 100vw',
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '0 clamp(2rem, 8vw, 10rem)',
-            boxSizing: 'border-box'
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              letterSpacing: '0.24em',
-              textTransform: 'uppercase',
-              color: 'rgba(255, 255, 255, 0.6)',
-              display: 'block',
-              marginBottom: '1.2rem'
-            }}
-          >
-            — THE FOUNDERS
-          </span>
-          <h3
-            style={{
-              fontFamily: 'var(--font-intro)',
-              fontSize: 'clamp(2.5rem, 5.5vw, 5rem)',
-              fontWeight: 900,
-              letterSpacing: '-0.03em',
-              color: '#FFFFFF',
-              margin: '0 0 2.5rem 0',
-              textTransform: 'uppercase'
-            }}
-          >
-            THE LEADERSHIP
-          </h3>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '3vw',
-              maxWidth: '1000px',
-              marginBottom: '2.5rem'
-            }}
-          >
-            {/* Oshim Kher Profile */}
-            <div
-              style={{
-                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-                paddingTop: '1.5rem'
-              }}
-            >
-              <h4
-                style={{
-                  fontFamily: 'var(--font-intro)',
-                  fontSize: 'clamp(1.6rem, 2.8vw, 2.5rem)',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  margin: '0 0 0.5rem 0',
-                  textTransform: 'uppercase'
-                }}
-              >
-                OSHIM KHER
-              </h4>
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  textTransform: 'uppercase',
-                  display: 'block'
-                }}
-              >
-                Performance · Growth · AI
-              </span>
-            </div>
-
-            {/* Aishwarya Soni Profile */}
-            <div
-              style={{
-                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-                paddingTop: '1.5rem'
-              }}
-            >
-              <h4
-                style={{
-                  fontFamily: 'var(--font-intro)',
-                  fontSize: 'clamp(1.6rem, 2.8vw, 2.5rem)',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  margin: '0 0 0.5rem 0',
-                  textTransform: 'uppercase'
-                }}
-              >
-                AISHWARYA SONI
-              </h4>
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.14em',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  textTransform: 'uppercase',
-                  display: 'block'
-                }}
-              >
-                Strategy · Creative · Brand
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <Link
-              href="/founders"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '1rem 2.2rem',
-                backgroundColor: '#FFFFFF',
-                color: '#000000',
-                borderRadius: '9999px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.82rem',
-                fontWeight: 800,
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              MEET THE FOUNDERS →
-            </Link>
-          </div>
-        </div>
       </div>
-
-      <style>{`
-        @media (max-width: 767px) {
-          #what-we-do-section {
-            height: auto !important;
-            overflow: visible !important;
-          }
-          .horizontal-scroll-track {
-            flex-direction: column !important;
-            width: 100% !important;
-            height: auto !important;
-            transform: none !important;
-          }
-          .system-scene-panel {
-            width: 100% !important;
-            height: auto !important;
-            min-height: 80vh !important;
-            padding: 5rem 1.5rem !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

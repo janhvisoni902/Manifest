@@ -69,7 +69,7 @@ function AppContent() {
       lenis.raf(time * 1000);
     };
     gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(1000, 16);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
       lenis.destroy();
@@ -173,7 +173,7 @@ function AppContent() {
   };
 
   return (
-    <div className="app-container" style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
+    <div className="app-container" style={{ overflowX: 'clip', width: '100%', maxWidth: '100vw' }}>
       {/* Intro splash overlay */}
       {sequenceState === 'loading' && pathname === '/' && (
         <Intro onFinished={() => setSequenceState('completed')} />
@@ -184,7 +184,7 @@ function AppContent() {
           opacity: transitionState === 'entering' ? 1 : 0,
           transition: 'opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
           width: '100%',
-          overflowX: 'hidden'
+          overflowX: 'clip'
         }}
       >
         {renderActivePage(displayPath)}

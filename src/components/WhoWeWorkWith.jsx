@@ -1,13 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
 import { contactInfo } from '../data/contact';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const isDebugMode = () =>
+  typeof window !== 'undefined' &&
+  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
 
 export default function WhoWeWorkWith() {
   const { navigate } = useRouter();
   const [hoveredId, setHoveredId] = useState(null);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
+
+  const sectionRef = useRef(null);
+  const centerRef = useRef(null);
+  const floatingLayerRef = useRef(null);
 
   // Position presets for 6 desktop floating items around center
   const floatingPositions = {
@@ -39,6 +51,117 @@ export default function WhoWeWorkWith() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // ScrollTrigger timeline using gsap.matchMedia
+  useEffect(() => {
+    const sectionEl = sectionRef.current;
+    if (!sectionEl) return;
+
+    const DEBUG = isDebugMode();
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
+        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
+        isReduced: '(prefers-reduced-motion: reduce)'
+      },
+      (context) => {
+        const { isDesktop, isReduced } = context.conditions;
+        if (isReduced) return;
+
+        const cards = floatingLayerRef.current
+          ? Array.from(floatingLayerRef.current.children)
+          : [];
+
+        if (isDesktop) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionEl,
+              start: 'top top',
+              end: '+=50%',
+              pin: true,
+              pinSpacing: true,
+              scrub: 0.5,
+              markers: DEBUG,
+              invalidateOnRefresh: true
+            }
+          });
+
+          if (centerRef.current) {
+            tl.fromTo(
+              centerRef.current,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
+            );
+          }
+
+          if (cards.length > 0) {
+            tl.fromTo(
+              cards,
+              { scale: 0.8, opacity: 0, y: 30 },
+              {
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                stagger: 0.12,
+                ease: 'power2.out'
+              },
+              '-=0.2'
+            );
+          }
+        } else {
+          // Mobile / Tablet reveal
+          if (centerRef.current) {
+            gsap.fromTo(
+              centerRef.current,
+              { y: 30, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: centerRef.current,
+                  start: 'top 80%',
+                  toggleActions: 'play none none reverse',
+                  markers: DEBUG
+                }
+              }
+            );
+          }
+
+          if (cards.length > 0) {
+            gsap.fromTo(
+              cards,
+              { scale: 0.9, opacity: 0, y: 20 },
+              {
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: sectionEl,
+                  start: 'top 70%',
+                  toggleActions: 'play none none reverse',
+                  markers: DEBUG
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+
+    document.fonts.ready.then(() => {
+      ScrollTrigger.refresh();
+    });
+
+    return () => mm.revert();
+  }, []);
+
   const handleCardClick = (e, ind) => {
     e.stopPropagation();
     if (selectedIndustryId === ind.id) {
@@ -58,6 +181,7 @@ export default function WhoWeWorkWith() {
 
   return (
     <section
+      ref={sectionRef}
       id="who-we-work-with"
       onClick={handleBackdropClick}
       style={{
@@ -88,6 +212,7 @@ export default function WhoWeWorkWith() {
       >
         {/* Central Content */}
         <motion.div
+          ref={centerRef}
           animate={{
             opacity: selectedIndustryId ? 0.22 : 1,
             scale: selectedIndustryId ? 0.95 : 1
@@ -99,7 +224,8 @@ export default function WhoWeWorkWith() {
             textAlign: 'center',
             maxWidth: '620px',
             padding: '2rem 1rem',
-            pointerEvents: selectedIndustryId ? 'none' : 'auto'
+            pointerEvents: selectedIndustryId ? 'none' : 'auto',
+            willChange: 'transform, opacity'
           }}
         >
           <h2
@@ -155,7 +281,7 @@ export default function WhoWeWorkWith() {
         </motion.div>
 
         {/* Floating Industry Cards (Desktop Composition) */}
-        <div className="desktop-floating-layer">
+        <div ref={floatingLayerRef} className="desktop-floating-layer">
           {manifestIndustriesData.map((ind) => {
             const isHovered = hoveredId === ind.id;
             const isSelected = selectedIndustryId === ind.id;
@@ -170,8 +296,6 @@ export default function WhoWeWorkWith() {
               <motion.div
                 key={ind.id}
                 initial={{ opacity: 0, scale: 0.88, y: 30 }}
-                whileInView={{ opacity: 1, scale: isSelected ? 1.25 : 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
                 animate={
                   isSelected
                     ? {
@@ -181,15 +305,8 @@ export default function WhoWeWorkWith() {
                         bottom: 'auto',
                         x: '-50%',
                         y: '-50%',
-                        scale: 1.28,
-                        opacity: 1,
-                        filter: 'none'
-                      }
-                    : isAnySelected
-                    ? {
-                        opacity: 0.2,
-                        scale: 0.9,
-                        filter: 'grayscale(100%) blur(1px)'
+                        scale: 1.25,
+                        opacity: 1
                       }
                     : {
                         top: pos.top,
@@ -197,245 +314,151 @@ export default function WhoWeWorkWith() {
                         right: pos.right,
                         bottom: pos.bottom,
                         x: 0,
-                        y: isHovered ? -8 : 0,
-                        scale: isHovered ? 1.1 : 1,
-                        opacity: 1,
-                        filter: 'none'
+                        opacity: isAnySelected ? 0.25 : 1,
+                        scale: isHovered ? 1.05 : 1
                       }
                 }
-                transition={{
-                  type: 'spring',
-                  stiffness: isSelected ? 260 : 320,
-                  damping: isSelected ? 24 : 28,
-                  mass: 0.8
-                }}
-                onMouseEnter={() => setHoveredId(ind.id)}
-                onMouseLeave={() => setHoveredId(null)}
+                transition={{ duration: 0.55, ease: [0.25, 1, 0.5, 1] }}
+                onMouseEnter={() => !isAnySelected && setHoveredId(ind.id)}
+                onMouseLeave={() => !isAnySelected && setHoveredId(null)}
                 onClick={(e) => handleCardClick(e, ind)}
+                className={`floating-industry-card ${isSelected ? 'selected' : ''}`}
                 style={{
                   position: 'absolute',
-                  ...(!isSelected ? pos : {}),
                   zIndex: cardZIndex,
-                  width: '230px',
+                  width: '280px',
+                  backgroundColor: '#181818',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  padding: '1.4rem',
+                  boxSizing: 'border-box',
+                  boxShadow: isSelected
+                    ? '0 30px 90px rgba(0, 0, 0, 0.55)'
+                    : isHovered
+                    ? '0 20px 50px rgba(0, 0, 0, 0.35)'
+                    : '0 10px 30px rgba(0, 0, 0, 0.18)',
                   cursor: 'pointer',
-                  pointerEvents: 'auto'
+                  willChange: 'transform, opacity'
                 }}
               >
-                {/* Floating motion effect (only active when not selected) */}
+                {/* Float Bounce Inner Wrapper */}
                 <motion.div
                   animate={isSelected ? { y: 0 } : { y: params.floatRange }}
                   transition={
                     isSelected
                       ? { duration: 0.3 }
-                      : { duration: params.duration, repeat: Infinity, ease: 'easeInOut' }
+                      : {
+                          duration: params.duration,
+                          repeat: Infinity,
+                          repeatType: 'mirror',
+                          ease: 'easeInOut',
+                          delay: params.delay
+                        }
                   }
-                  className="floating-card-inner"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    backgroundColor: isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.88)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    padding: '12px',
-                    border: isSelected
-                      ? '1.5px solid #181818'
-                      : isHovered
-                      ? '1px solid rgba(24, 24, 24, 0.4)'
-                      : '1px solid rgba(24, 24, 24, 0.12)',
-                    borderRadius: '6px',
-                    boxShadow: isSelected
-                      ? '0 25px 50px rgba(0, 0, 0, 0.22), 0 0 35px rgba(255, 255, 255, 0.7)'
-                      : isHovered
-                      ? '0 18px 36px rgba(0, 0, 0, 0.14), 0 0 20px rgba(255, 255, 255, 0.45)'
-                      : '0 8px 24px rgba(0, 0, 0, 0.05)',
-                    transition: 'box-shadow 0.3s ease, border-color 0.3s ease'
-                  }}
                 >
                   <div
                     style={{
-                      width: '100%',
-                      height: '145px',
-                      backgroundColor: '#181818',
-                      overflow: 'hidden',
-                      borderRadius: '3px',
-                      position: 'relative'
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '0.8rem'
                     }}
                   >
-                    <img
-                      src={ind.imgSrc}
-                      alt={ind.title}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center',
-                        filter: isSelected ? 'none' : 'grayscale(100%) contrast(106%)',
-                        transform: isHovered && !isSelected ? 'scale(1.06)' : 'scale(1)',
-                        transition: 'transform 0.5s ease, filter 0.3s ease'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 4px' }}>
                     <span
                       style={{
                         fontFamily: 'var(--font-mono, monospace)',
-                        fontSize: isSelected ? '0.75rem' : '0.68rem',
-                        fontWeight: isSelected ? 800 : 700,
-                        letterSpacing: '0.14em',
-                        color: '#181818',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.16em',
+                        color: 'rgba(255, 255, 255, 0.45)'
+                      }}
+                    >
+                      [{ind.num}]
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        color: '#FFFFFF',
+                        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '9999px',
                         textTransform: 'uppercase'
                       }}
                     >
-                      [{ind.title}]
-                    </span>
-
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-mono, monospace)',
-                        fontSize: '0.65rem',
-                        color: isSelected ? '#181818' : 'rgba(24, 24, 24, 0.4)',
-                        fontWeight: isSelected ? 800 : 400
-                      }}
-                    >
-                      {isSelected ? 'VIEW →' : `0${manifestIndustriesData.indexOf(ind) + 1}`}
+                      {ind.metric}
                     </span>
                   </div>
 
-                  {isSelected && (
-                    <div
-                      style={{
-                        marginTop: '4px',
-                        paddingTop: '8px',
-                        borderTop: '1px solid rgba(24, 24, 24, 0.15)',
-                        textAlign: 'center'
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: 'var(--font-mono, monospace)',
-                          fontSize: '0.68rem',
-                          fontWeight: 800,
-                          letterSpacing: '0.16em',
-                          color: '#181818',
-                          textTransform: 'uppercase'
-                        }}
-                      >
-                        VIEW INDUSTRY DETAILS →
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Mobile/Tablet Fallback Grid */}
-        <div className="mobile-grid-layer">
-          {manifestIndustriesData.map((ind) => {
-            const isSelected = selectedIndustryId === ind.id;
-            return (
-              <div
-                key={ind.id}
-                onClick={(e) => handleCardClick(e, ind)}
-                className="mobile-card-item"
-                style={{
-                  backgroundColor: isSelected ? '#FFFFFF' : 'rgba(255, 255, 255, 0.85)',
-                  border: isSelected ? '1.5px solid #181818' : '1px solid rgba(24, 24, 24, 0.12)',
-                  borderRadius: '6px',
-                  padding: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: isSelected ? '0 12px 30px rgba(0,0,0,0.15)' : 'none'
-                }}
-              >
-                <div
-                  style={{
-                    width: '100%',
-                    height: '160px',
-                    backgroundColor: '#181818',
-                    overflow: 'hidden',
-                    borderRadius: '3px',
-                    marginBottom: '0.8rem'
-                  }}
-                >
-                  <img
-                    src={ind.imgSrc}
-                    alt={ind.title}
+                  <h3
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      filter: 'grayscale(100%) contrast(106%)'
-                    }}
-                  />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-mono, monospace)',
-                      fontSize: '0.72rem',
-                      fontWeight: 800,
-                      letterSpacing: '0.14em',
-                      color: '#181818',
+                      fontFamily: 'var(--font-intro, sans-serif)',
+                      fontSize: '1.3rem',
+                      fontWeight: 900,
+                      letterSpacing: '-0.02em',
+                      color: '#FFFFFF',
+                      margin: '0 0 0.5rem 0',
                       textTransform: 'uppercase'
                     }}
                   >
-                    [{ind.title}]
-                  </span>
-                  <span
+                    {ind.title}
+                  </h3>
+
+                  <p
                     style={{
-                      fontFamily: 'var(--font-mono, monospace)',
-                      fontSize: '0.68rem',
-                      fontWeight: 700,
-                      color: '#181818'
+                      fontSize: '0.82rem',
+                      lineHeight: 1.4,
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      margin: '0 0 1rem 0'
                     }}
                   >
-                    {isSelected ? 'TAP TO VIEW →' : 'SELECT'}
-                  </span>
-                </div>
-              </div>
+                    {ind.desc}
+                  </p>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '0.75rem',
+                      fontFamily: 'var(--font-mono, monospace)',
+                      fontWeight: 800,
+                      letterSpacing: '0.14em',
+                      color: '#FFFFFF',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    {isSelected ? 'CLICK TO EXPLORE →' : 'LEARN MORE →'}
+                  </div>
+                </motion.div>
+              </motion.div>
             );
           })}
         </div>
       </div>
 
       <style>{`
-        .desktop-floating-layer {
-          display: block;
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-        }
-
-        .mobile-grid-layer {
-          display: none;
-          width: 100%;
-          margin-top: 3.5rem;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1.5rem;
-          position: relative;
-          z-index: 10;
-        }
-
         @media (max-width: 1023px) {
           .who-we-work-container {
             min-height: auto !important;
           }
           .desktop-floating-layer {
-            display: none !important;
-          }
-          .mobile-grid-layer {
+            position: relative !important;
             display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+            gap: 1.5rem !important;
+            width: 100% !important;
+            margin-top: 3rem !important;
           }
-        }
-
-        @media (max-width: 580px) {
-          .mobile-grid-layer {
-            grid-template-columns: 1fr !important;
-            gap: 2rem !important;
+          .floating-industry-card {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+            width: 100% !important;
           }
         }
       `}</style>

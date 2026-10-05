@@ -4,6 +4,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const isDebugMode = () =>
+  typeof window !== 'undefined' &&
+  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
+
 export default function HelloSection({ immediate = false }) {
   const sectionRef = useRef(null);
   const headlineRef = useRef(null);
@@ -13,37 +17,38 @@ export default function HelloSection({ immediate = false }) {
     const el = sectionRef.current;
     if (!el) return;
 
+    const DEBUG = isDebugMode();
     const mm = gsap.matchMedia();
 
     mm.add(
       {
-        isMotionAllowed: '(prefers-reduced-motion: no-preference)',
+        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
+        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
         isReduced: '(prefers-reduced-motion: reduce)'
       },
       (context) => {
-        const { isMotionAllowed } = context.conditions;
+        const { isDesktop, isReduced } = context.conditions;
+        if (isReduced) return;
 
-        if (isMotionAllowed) {
-          // `immediate`: section is rising over the angel video, so play on mount
-          // instead of waiting for a scroll position.
-          const tl = gsap.timeline(
-            immediate
-              ? { delay: 0.5 }
-              : {
-                  scrollTrigger: {
-                    trigger: el,
-                    start: 'top 70%',
-                    end: 'bottom 20%',
-                    toggleActions: 'play none none reverse'
-                  }
-                }
-          );
+        if (isDesktop && !immediate) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: el,
+              start: 'top top',
+              end: '+=40%',
+              pin: true,
+              pinSpacing: true,
+              scrub: 0.5,
+              markers: DEBUG,
+              invalidateOnRefresh: true
+            }
+          });
 
           if (headlineRef.current) {
             tl.fromTo(
               headlineRef.current,
-              { y: 40, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
             );
           }
 
@@ -51,13 +56,54 @@ export default function HelloSection({ immediate = false }) {
             tl.fromTo(
               statementRef.current,
               { y: 30, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
-              '-=0.5'
+              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' },
+              '-=0.2'
+            );
+          }
+
+          tl.to(el, {
+            scale: 0.98,
+            opacity: 0.9,
+            duration: 0.2,
+            ease: 'power1.inOut'
+          });
+        } else {
+          const tl = gsap.timeline(
+            immediate
+              ? { delay: 0.3 }
+              : {
+                  scrollTrigger: {
+                    trigger: el,
+                    start: 'top 75%',
+                    toggleActions: 'play none none reverse',
+                    markers: DEBUG
+                  }
+                }
+          );
+
+          if (headlineRef.current) {
+            tl.fromTo(
+              headlineRef.current,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
+            );
+          }
+
+          if (statementRef.current) {
+            tl.fromTo(
+              statementRef.current,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' },
+              '-=0.4'
             );
           }
         }
       }
     );
+
+    document.fonts.ready.then(() => {
+      ScrollTrigger.refresh();
+    });
 
     return () => mm.revert();
   }, [immediate]);
@@ -100,7 +146,8 @@ export default function HelloSection({ immediate = false }) {
             color: '#181818',
             textTransform: 'uppercase',
             margin: '0 0 3rem 0',
-            maxWidth: '1000px'
+            maxWidth: '1000px',
+            willChange: 'transform, opacity'
           }}
         >
           HELLO,<br />
@@ -118,7 +165,8 @@ export default function HelloSection({ immediate = false }) {
             lineHeight: 1.35,
             color: 'rgba(24, 24, 24, 0.88)',
             maxWidth: '860px',
-            margin: 0
+            margin: 0,
+            willChange: 'transform, opacity'
           }}
         >
           We help global brands turn paid traffic into predictable, scalable revenue — aligning every dollar with real backend growth.

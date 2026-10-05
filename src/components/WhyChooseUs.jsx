@@ -6,6 +6,10 @@ import { contactInfo } from '../data/contact';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const isDebugMode = () =>
+  typeof window !== 'undefined' &&
+  (window.location.search.includes('debug=true') || window.location.search.includes('debug=1'));
+
 export default function WhyChooseUs() {
   const sectionRef = useRef(null);
   const heroRef = useRef(null);
@@ -51,64 +55,126 @@ export default function WhyChooseUs() {
     const el = sectionRef.current;
     if (!el) return;
 
+    const DEBUG = isDebugMode();
     const mm = gsap.matchMedia();
 
     mm.add(
       {
-        isMotionAllowed: '(prefers-reduced-motion: no-preference)',
+        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
+        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
         isReduced: '(prefers-reduced-motion: reduce)'
       },
       (context) => {
-        const { isMotionAllowed } = context.conditions;
+        const { isDesktop, isReduced } = context.conditions;
+        if (isReduced) return;
 
-        if (isMotionAllowed) {
+        if (isDesktop) {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: el,
+              start: 'top top',
+              end: '+=50%',
+              pin: true,
+              pinSpacing: true,
+              scrub: 0.5,
+              markers: DEBUG,
+              invalidateOnRefresh: true
+            }
+          });
+
           if (heroRef.current) {
-            gsap.from(heroRef.current.children, {
-              y: 35,
-              opacity: 0,
-              duration: 0.9,
-              stagger: 0.2,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: heroRef.current,
-                start: 'top 80%',
-                toggleActions: 'play none none reverse'
-              }
-            });
+            tl.fromTo(
+              heroRef.current.children,
+              { y: 35, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
+            );
           }
 
           if (cardsRef.current) {
-            gsap.from(cardsRef.current.children, {
-              y: 40,
-              opacity: 0,
-              duration: 0.8,
-              stagger: 0.18,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: cardsRef.current,
-                start: 'top 75%',
-                toggleActions: 'play none none reverse'
-              }
-            });
+            tl.fromTo(
+              cardsRef.current.children,
+              { y: 40, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: 'power2.out' },
+              '-=0.2'
+            );
           }
 
           if (ctaRef.current) {
-            gsap.from(ctaRef.current.children, {
-              y: 30,
-              opacity: 0,
-              duration: 0.8,
-              stagger: 0.15,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: ctaRef.current,
-                start: 'top 85%',
-                toggleActions: 'play none none reverse'
+            tl.fromTo(
+              ctaRef.current.children,
+              { y: 30, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' },
+              '-=0.2'
+            );
+          }
+        } else {
+          // Mobile / tablet reveal
+          if (heroRef.current) {
+            gsap.fromTo(
+              heroRef.current.children,
+              { y: 35, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: heroRef.current,
+                  start: 'top 80%',
+                  toggleActions: 'play none none reverse',
+                  markers: DEBUG
+                }
               }
-            });
+            );
+          }
+
+          if (cardsRef.current) {
+            gsap.fromTo(
+              cardsRef.current.children,
+              { y: 40, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: cardsRef.current,
+                  start: 'top 75%',
+                  toggleActions: 'play none none reverse',
+                  markers: DEBUG
+                }
+              }
+            );
+          }
+
+          if (ctaRef.current) {
+            gsap.fromTo(
+              ctaRef.current.children,
+              { y: 30, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: ctaRef.current,
+                  start: 'top 85%',
+                  toggleActions: 'play none none reverse',
+                  markers: DEBUG
+                }
+              }
+            );
           }
         }
       }
     );
+
+    document.fonts.ready.then(() => {
+      ScrollTrigger.refresh();
+    });
 
     return () => mm.revert();
   }, []);
@@ -128,9 +194,8 @@ export default function WhyChooseUs() {
       }}
     >
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        
         {/* 03 — HERO */}
-        <div ref={heroRef} style={{ marginBottom: '5rem' }}>
+        <div ref={heroRef} style={{ marginBottom: '5rem', willChange: 'transform, opacity' }}>
           <h2
             style={{
               fontFamily: 'var(--font-intro)',
@@ -177,7 +242,8 @@ export default function WhyChooseUs() {
                 display: 'flex',
                 flexDirection: 'column',
                 borderTop: '1px solid rgba(24, 24, 24, 0.2)',
-                paddingTop: '1.2rem'
+                paddingTop: '1.2rem',
+                willChange: 'transform, opacity'
               }}
             >
               {/* Card Image Area */}
@@ -275,7 +341,8 @@ export default function WhyChooseUs() {
             paddingTop: '4.5rem',
             textAlign: 'center',
             maxWidth: '650px',
-            margin: '0 auto'
+            margin: '0 auto',
+            willChange: 'transform, opacity'
           }}
         >
           <h3
@@ -325,7 +392,6 @@ export default function WhyChooseUs() {
             START A PROJECT →
           </Link>
         </div>
-
       </div>
 
       <style>{`
