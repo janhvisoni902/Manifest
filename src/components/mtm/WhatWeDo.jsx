@@ -99,27 +99,39 @@ export default function WhatWeDo() {
         pointRefs.current.forEach((pointEl, idx) => {
           if (!pointEl) return;
           const isLast = idx === pointRefs.current.length - 1;
-          const shouldPin = isDesktop && !isLast;
 
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: pointEl,
-              start: 'top 65%',
-              end: shouldPin ? '+=18%' : 'top 20%',
-              pin: shouldPin ? pointEl : false,
-              pinSpacing: shouldPin,
-              scrub: shouldPin ? 0.5 : false,
-              toggleActions: shouldPin ? undefined : 'play none none reverse',
-              markers: DEBUG,
-              invalidateOnRefresh: true
-            }
-          });
-
-          tl.fromTo(
+          // Trigger 1: Entrance (top 80%, no pin, toggleActions: play none none reverse)
+          gsap.fromTo(
             pointEl,
             { opacity: 0, y: 40 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: pointEl,
+                start: 'top 80%',
+                toggleActions: 'play none none reverse',
+                markers: DEBUG
+              }
+            }
           );
+
+          // Trigger 2: Hold (center center, end: +=22%, pin: true, no scrub)
+          // Applied only on Desktop (≥1024px) to full-height non-last points.
+          if (isDesktop && !isLast) {
+            ScrollTrigger.create({
+              trigger: pointEl,
+              start: 'center center',
+              end: '+=22%',
+              pin: true,
+              pinSpacing: true,
+              scrub: false,
+              markers: DEBUG,
+              invalidateOnRefresh: true
+            });
+          }
         });
       }
     );
@@ -153,7 +165,8 @@ export default function WhatWeDo() {
           className="wwd-point"
           style={{
             width: '100vw',
-            minHeight: '100vh',
+            minHeight: '100svh',
+            height: '100vh',
             position: 'relative',
             overflow: 'hidden',
             backgroundColor: '#0F1017',
@@ -185,7 +198,8 @@ export default function WhatWeDo() {
           className="wwd-point"
           style={{
             width: '100%',
-            minHeight: '100vh',
+            minHeight: '100svh',
+            height: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -246,7 +260,8 @@ export default function WhatWeDo() {
             className="wwd-point"
             style={{
               width: '100%',
-              minHeight: '100vh',
+              minHeight: '100svh',
+              height: '100vh',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -334,7 +349,7 @@ export default function WhatWeDo() {
           className="wwd-point"
           style={{
             width: '100%',
-            minHeight: '100vh',
+            minHeight: '100svh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
