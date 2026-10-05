@@ -81,7 +81,7 @@ export default function HelloSection({ immediate = false }) {
     );
 
     return () => mm.revert();
-  }, []);
+  }, [immediate]);
 
   return (
     <section

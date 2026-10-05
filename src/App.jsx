@@ -5,9 +5,7 @@ import { gsap, ScrollTrigger } from './lib/gsap';
 import { RouterProvider, useRouter } from './lib/router';
 
 // Navigation & Structure
-import Footer from './components/Footer';
 import Intro from './components/Intro';
-import VideoReveal from './components/VideoReveal';
 
 // Pages
 import Home from './pages/Home';

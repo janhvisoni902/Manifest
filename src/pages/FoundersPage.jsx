@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import Footer from '../components/Footer';
-import { Link } from '../lib/router';
 import { contactInfo } from '../data/contact';
 
 export default function FoundersPage({ onScheduleCall }) {
