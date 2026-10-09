@@ -1,13 +1,38 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const RouterContext = createContext(null);
+const BASE = import.meta.env.BASE_URL || '/';
+
+function normalizePath(rawPath) {
+  if (!rawPath) return '/';
+  let path = rawPath;
+  const baseNoTrailing = BASE.endsWith('/') ? BASE.slice(0, -1) : BASE;
+  if (baseNoTrailing && (path === baseNoTrailing || path.startsWith(baseNoTrailing + '/'))) {
+    path = path.slice(baseNoTrailing.length);
+  }
+  if (!path.startsWith('/')) {
+    path = '/' + path;
+  }
+  return path || '/';
+}
+
+function withBase(href) {
+  if (href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('#')) {
+    return href;
+  }
+  const baseNoTrailing = BASE.endsWith('/') ? BASE.slice(0, -1) : BASE;
+  if (href.startsWith('/')) {
+    return `${baseNoTrailing}${href}`;
+  }
+  return `${baseNoTrailing}/${href}`;
+}
 
 export function RouterProvider({ children }) {
-  const [pathname, setPathname] = useState(window.location.pathname);
+  const [pathname, setPathname] = useState(() => normalizePath(window.location.pathname));
 
   useEffect(() => {
     const handlePopState = () => {
-      setPathname(window.location.pathname);
+      setPathname(normalizePath(window.location.pathname));
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -33,8 +58,9 @@ export function RouterProvider({ children }) {
       window.lenis.scrollTo(0, { immediate: true });
     }
 
-    window.history.pushState(null, '', href);
-    setPathname(href);
+    const targetUrl = withBase(href);
+    window.history.pushState(null, '', targetUrl);
+    setPathname(normalizePath(href));
   };
 
   return (
@@ -70,12 +96,14 @@ export function Link({ href, children, activeClassName, className = '', style = 
     navigate(href);
   };
 
-  const isActive = pathname === href;
+  const isActive = pathname === normalizePath(href);
   const combinedClass = [className, isActive ? activeClassName : ''].filter(Boolean).join(' ');
+  const targetHref = withBase(href);
 
   return (
-    <a href={href} onClick={handleClick} className={combinedClass} style={style} {...props}>
+    <a href={targetHref} onClick={handleClick} className={combinedClass} style={style} {...props}>
       {children}
     </a>
   );
 }
+

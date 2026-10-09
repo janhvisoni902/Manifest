@@ -39,7 +39,7 @@ export default function WelcomeModal({ isSequenceFinished, onScheduleCall }) {
     if (typeof window === 'undefined') return true;
 
     // 1. Must be on homepage route ('/')
-    const currentPath = window.location.pathname || pathname;
+    const currentPath = pathname;
     if (currentPath !== '/') return true;
 
     // 2. Session check (shown once per session)

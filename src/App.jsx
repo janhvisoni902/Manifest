@@ -20,8 +20,9 @@ function AppContent() {
   const { pathname } = useRouter();
   const [sequenceState, setSequenceState] = useState(() => {
     // Bypasses intro if reduced motion preferred or on inner routes
-    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion || window.location.pathname !== '/') {
+    const initialPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+    const isHome = initialPath === '/' || initialPath === '/Manifest' || initialPath === '/Manifest/';
+    if (prefersReducedMotion || !isHome) {
       return 'completed';
     }
     return 'loading';
