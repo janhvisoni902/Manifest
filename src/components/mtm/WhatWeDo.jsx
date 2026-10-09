@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Link } from '../../lib/router';
+import { Link, assetUrl } from '../../lib/router';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -150,7 +150,7 @@ export default function WhatWeDo() {
           }}
         >
           <img
-            src="/images/what-we-do-hero.jpg"
+            src={assetUrl('/images/what-we-do-hero.jpg')}
             alt="WHAT WE DO — Manifest Tech Media"
             style={{
               width: '100%',

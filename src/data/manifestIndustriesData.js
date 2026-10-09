@@ -1,9 +1,11 @@
+import { assetUrl } from '../lib/router';
+
 export const manifestIndustriesData = [
   {
     id: 'founders',
     title: 'FOUNDERS',
     slug: 'founders',
-    imgSrc: '/images/why-us/why-us-1.jpg',
+    imgSrc: assetUrl('/images/why-us/why-us-1.jpg'),
     tagline: 'Personal brand & company positioning built for founder-led growth.',
     intro: 'We help visionary founders translate their personal authority into business leverage, audience trust, and scalable customer acquisition.',
     howWeHelp: 'Founders are the ultimate trust proxy for modern brands. We build content systems, media assets, and acquisition funnels centered around your voice and vision.',
@@ -23,7 +25,7 @@ export const manifestIndustriesData = [
     id: 'ecommerce',
     title: 'E-COMMERCE',
     slug: 'ecommerce',
-    imgSrc: '/images/work-tissot.jpg',
+    imgSrc: assetUrl('/images/work-tissot.jpg'),
     tagline: 'Turning paid attention into a system that compounds.',
     intro: 'We build high-performance creative and media acquisition systems for ambitious e-commerce brands seeking profitable scale.',
     howWeHelp: 'Rather than relying on one-off winning ads, we deploy an integrated revenue system combining rapid creative iteration, multi-channel media buying, and conversion optimization.',
@@ -43,7 +45,7 @@ export const manifestIndustriesData = [
     id: 'saas-ai',
     title: 'SAAS / AI',
     slug: 'saas-ai',
-    imgSrc: '/assets/images/third-page.jpg',
+    imgSrc: assetUrl('/assets/images/third-page.jpg'),
     tagline: 'High-velocity user acquisition for software and AI products.',
     intro: 'We help SaaS and AI companies turn complex product value into clear, high-converting messaging and acquisition campaigns.',
     howWeHelp: 'Technical innovation needs concise messaging. We bridge product features with market pain points, driving trial signups and demo bookings at scale.',
@@ -63,7 +65,7 @@ export const manifestIndustriesData = [
     id: 'service-businesses',
     title: 'SERVICE BUSINESSES',
     slug: 'service-businesses',
-    imgSrc: '/images/why-us/why-us-8.jpg',
+    imgSrc: assetUrl('/images/why-us/why-us-8.jpg'),
     tagline: 'Predictable high-ticket client acquisition systems.',
     intro: 'We build predictable pipeline engines for high-value B2B and professional service firms.',
     howWeHelp: 'Service businesses thrive on trust and proof. We engineer trust-first marketing campaigns that position your expertise ahead of the sales conversation.',
@@ -83,7 +85,7 @@ export const manifestIndustriesData = [
     id: 'coaches-consultants',
     title: 'COACHES / CONSULTANTS',
     slug: 'coaches-consultants',
-    imgSrc: '/images/event-gallery-7.jpg',
+    imgSrc: assetUrl('/images/event-gallery-7.jpg'),
     tagline: 'Authority marketing for industry experts and advisors.',
     intro: 'We build high-converting brand engines for premium advisors, coaches, and strategic consultants.',
     howWeHelp: 'When you are the product, your marketing must project total clarity and authority. We build evergreen funnels that attract premium clients predictably.',
@@ -96,14 +98,14 @@ export const manifestIndustriesData = [
     whatWeFocusOn: [
       'Attracting high-paying, committed clients',
       'Automating lead qualification before discovery calls',
-      'Building scalable digital product and mastermind extensions'
+      'Building scalable digital product and mastermind environments'
     ]
   },
   {
     id: 'dtc-brands',
     title: 'DTC BRANDS',
     slug: 'dtc-brands',
-    imgSrc: '/images/work-goodyear.jpg',
+    imgSrc: assetUrl('/images/work-goodyear.jpg'),
     tagline: 'Brand narrative meets direct response performance.',
     intro: 'We scale direct-to-consumer brands through culturally resonant creative strategy and full-funnel media execution.',
     howWeHelp: 'Modern DTC brands require a balance of high-end editorial aesthetics and rigorous direct response data analytics to scale sustainably.',

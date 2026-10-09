@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { assetUrl } from '../lib/router';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,7 +38,7 @@ export default function CanvasHero({ sequenceState }) {
 
   function getPrimaryFrameUrl(index) {
     const paddedIndex = String(index).padStart(CONFIG.frameNamePadding, '0');
-    return `${CONFIG.framesFolder}${CONFIG.frameNamePrefix}${paddedIndex}${CONFIG.frameExtension}`;
+    return assetUrl(`${CONFIG.framesFolder}${CONFIG.frameNamePrefix}${paddedIndex}${CONFIG.frameExtension}`);
   }
 
   function renderFrame(index) {

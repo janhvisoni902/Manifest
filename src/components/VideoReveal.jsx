@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { assetUrl } from '../lib/router';
 
 /**
  * VideoReveal Component
@@ -185,7 +186,7 @@ export default function VideoReveal({ isActive, onFinished }) {
         {/* Angel Video Asset inside Expanding Portal Window */}
         <video
           ref={videoRef}
-          src="/videos/intro-reveal.mp4"
+          src={assetUrl('/videos/intro-reveal.mp4')}
           muted
           playsInline
           autoPlay

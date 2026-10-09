@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Link } from '../lib/router';
+import { Link, assetUrl } from '../lib/router';
 import { contactInfo } from '../data/contact';
 import { isDebugMode } from '../lib/hitch';
 
@@ -20,7 +20,7 @@ export default function WhyChooseUs() {
       desc: 'The system behind sustainable growth.',
       linkText: 'EXPLORE →',
       href: '/system',
-      imgSrc: '/frames/frame_0001.jpg'
+      imgSrc: assetUrl('/frames/frame_0001.jpg')
     },
     {
       num: '02',
@@ -28,7 +28,7 @@ export default function WhyChooseUs() {
       desc: 'What our clients say.',
       linkText: 'EXPLORE →',
       href: '/case-studies',
-      imgSrc: '/frames/frame_0050.jpg'
+      imgSrc: assetUrl('/frames/frame_0050.jpg')
     },
     {
       num: '03',
@@ -36,7 +36,7 @@ export default function WhyChooseUs() {
       desc: 'Growth you can measure.',
       linkText: 'EXPLORE →',
       href: '/case-studies',
-      imgSrc: '/frames/frame_0100.jpg'
+      imgSrc: assetUrl('/frames/frame_0100.jpg')
     },
     {
       num: '04',
@@ -44,7 +44,7 @@ export default function WhyChooseUs() {
       desc: 'Strategy built around the whole business.',
       linkText: 'EXPLORE →',
       href: '/founders',
-      imgSrc: '/frames/frame_0200.jpg'
+      imgSrc: assetUrl('/frames/frame_0200.jpg')
     }
   ];
 
