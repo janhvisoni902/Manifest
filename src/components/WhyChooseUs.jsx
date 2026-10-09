@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from '../lib/router';
 import { contactInfo } from '../data/contact';
-import { createHitchTrigger, isDebugMode } from '../lib/hitch';
+import { isDebugMode } from '../lib/hitch';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,67 +53,40 @@ export default function WhyChooseUs() {
     if (!el) return;
 
     const DEBUG = isDebugMode();
-    const mm = gsap.matchMedia();
 
-    mm.add(
-      {
-        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
-        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
-        isReduced: '(prefers-reduced-motion: reduce)'
-      },
-      (context) => {
-        const { isDesktop, isReduced } = context.conditions;
-
-        const animateContent = () => {
-          if (heroRef.current) {
-            gsap.fromTo(
-              heroRef.current.children,
-              { y: 35, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out' }
-            );
-          }
-          if (cardsRef.current) {
-            gsap.fromTo(
-              cardsRef.current.children,
-              { y: 40, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
-            );
-          }
-          if (ctaRef.current) {
-            gsap.fromTo(
-              ctaRef.current.children,
-              { y: 30, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
-            );
-          }
-        };
-
-        if (isReduced) {
-          animateContent();
-          return;
-        }
-
-        if (isDesktop) {
-          createHitchTrigger({
-            sectionEl: el,
-            sectionName: 'WhyChooseUs',
-            holdDurationMs: 800,
-            onAnimate: animateContent
-          });
-        } else {
-          // Mobile: ScrollTrigger entrance reveal only
-          ScrollTrigger.create({
-            trigger: el,
-            start: 'top 75%',
-            markers: DEBUG,
-            invalidateOnRefresh: true,
-            onEnter: animateContent
-          });
-        }
+    const animateContent = () => {
+      if (heroRef.current) {
+        gsap.fromTo(
+          heroRef.current.children,
+          { y: 35, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out' }
+        );
       }
-    );
+      if (cardsRef.current) {
+        gsap.fromTo(
+          cardsRef.current.children,
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+        );
+      }
+      if (ctaRef.current) {
+        gsap.fromTo(
+          ctaRef.current.children,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+        );
+      }
+    };
 
-    return () => mm.revert();
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: 'top 75%',
+      markers: DEBUG,
+      invalidateOnRefresh: true,
+      onEnter: animateContent
+    });
+
+    return () => trigger.kill();
   }, []);
 
   return (

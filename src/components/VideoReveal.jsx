@@ -194,7 +194,7 @@ export default function VideoReveal({ isActive, onFinished }) {
             width: '100vw',
             height: '100vh',
             objectFit: 'cover',
-            objectPosition: 'center',
+            objectPosition: 'center center',
             filter: 'grayscale(100%) contrast(125%) brightness(0.95)',
             display: 'block'
           }}

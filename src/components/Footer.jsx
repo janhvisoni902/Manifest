@@ -16,16 +16,30 @@ export default function Footer() {
 
   return (
     <footer
+      id="footer"
+      className="site-footer"
       style={{
+        position: 'relative',
         backgroundColor: '#0F1017',
         color: '#FFFFFF',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
         padding: '5rem 2.5rem 2.5rem',
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
         boxSizing: 'border-box'
       }}
     >
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-        
+      {/* Footer Main Content */}
+      <div
+        className="footer-content"
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          maxWidth: '1280px',
+          margin: '0 auto',
+          width: '100%'
+        }}
+      >
         {/* Main Footer Columns */}
         <div
           style={{
@@ -39,7 +53,7 @@ export default function Footer() {
           <div style={{ gridColumn: 'span 1' }}>
             <h3
               style={{
-                fontFamily: 'var(--font-intro)',
+                fontFamily: 'var(--font-intro, sans-serif)',
                 fontSize: '1.4rem',
                 fontWeight: 900,
                 letterSpacing: '-0.03em',
@@ -50,38 +64,121 @@ export default function Footer() {
             >
               MANIFEST TECH MEDIA
             </h3>
-            <p style={{ opacity: 0.7, fontSize: '0.88rem', lineHeight: 1.6, marginBottom: '1.5rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+            <p
+              style={{
+                fontSize: '0.88rem',
+                lineHeight: 1.6,
+                marginBottom: '1.5rem',
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontWeight: 400
+              }}
+            >
               Revenue Engineering, Funnel Architecture, and High-Scale Media Systems. Founded by Oshim Kher & Aishwarya Soni.
             </p>
           </div>
 
           {/* Column 1: Navigation */}
           <div>
-            <h4 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.14em' }}>
+            <h4
+              style={{
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '0.8rem',
+                color: 'rgba(255, 255, 255, 0.45)',
+                marginBottom: '1.2rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                fontWeight: 700
+              }}
+            >
               Navigation
             </h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.9rem' }}>
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+                fontSize: '0.9rem',
+                fontWeight: 500
+              }}
+            >
               <li>
-                <Link href="/" style={{ color: pathname === '/' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>Home</Link>
+                <Link
+                  href="/"
+                  style={{
+                    color: pathname === '/' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                    textDecoration: 'none'
+                  }}
+                >
+                  Home
+                </Link>
               </li>
               <li>
-                <Link href="/system" style={{ color: pathname === '/system' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>The System</Link>
+                <Link
+                  href="/system"
+                  style={{
+                    color: pathname === '/system' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                    textDecoration: 'none'
+                  }}
+                >
+                  The System
+                </Link>
               </li>
               <li>
-                <Link href="/founders" style={{ color: pathname === '/founders' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>Founders</Link>
+                <Link
+                  href="/founders"
+                  style={{
+                    color: pathname === '/founders' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                    textDecoration: 'none'
+                  }}
+                >
+                  Founders
+                </Link>
               </li>
               <li>
-                <Link href="/case-studies" style={{ color: pathname === '/case-studies' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>Case Studies</Link>
+                <Link
+                  href="/case-studies"
+                  style={{
+                    color: pathname === '/case-studies' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                    textDecoration: 'none'
+                  }}
+                >
+                  Case Studies
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Column 2: Capabilities */}
           <div>
-            <h4 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.14em' }}>
+            <h4
+              style={{
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '0.8rem',
+                color: 'rgba(255, 255, 255, 0.45)',
+                marginBottom: '1.2rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                fontWeight: 700
+              }}
+            >
               Capabilities
             </h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.65)' }}>
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+                fontSize: '0.9rem',
+                color: 'rgba(255, 255, 255, 0.75)',
+                fontWeight: 500
+              }}
+            >
               <li>Paid Acquisition Engine</li>
               <li>Conversion Funnel Architecture</li>
               <li>Backend Revenue Systems</li>
@@ -91,18 +188,28 @@ export default function Footer() {
 
           {/* Column 3: Connect */}
           <div>
-            <h4 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.14em' }}>
+            <h4
+              style={{
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '0.8rem',
+                color: 'rgba(255, 255, 255, 0.45)',
+                marginBottom: '1.2rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                fontWeight: 700
+              }}
+            >
               Connect
             </h4>
-            <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.7)', lineHeight: 1.6, marginBottom: '1rem' }}>
+            <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.6, marginBottom: '1rem', fontWeight: 400 }}>
               Ready to build your revenue engine?
             </p>
             <Link
               href={`mailto:${contactInfo.email}`}
               style={{
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--font-mono, monospace)',
                 fontSize: '0.8rem',
-                fontWeight: 800,
+                fontWeight: 700,
                 color: '#0F1017',
                 backgroundColor: '#FFFFFF',
                 padding: '0.75rem 1.4rem',
@@ -119,7 +226,20 @@ export default function Footer() {
         </div>
 
         {/* Back to Top & Copyright */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '2rem', fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+            paddingTop: '2rem',
+            fontSize: '0.8rem',
+            color: 'rgba(255, 255, 255, 0.5)',
+            fontWeight: 500
+          }}
+        >
           <div>
             © 2026 Manifest Tech Media. All rights reserved.
           </div>
@@ -128,7 +248,7 @@ export default function Footer() {
               href="#"
               onClick={handleBackToTop}
               style={{
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--font-mono, monospace)',
                 fontSize: '0.8rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.14em',
@@ -141,8 +261,8 @@ export default function Footer() {
             </a>
           </div>
         </div>
-
       </div>
     </footer>
   );
 }
+

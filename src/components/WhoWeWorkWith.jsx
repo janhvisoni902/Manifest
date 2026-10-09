@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
 import { contactInfo } from '../data/contact';
-import { createHitchTrigger, isDebugMode } from '../lib/hitch';
+import { isDebugMode } from '../lib/hitch';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,72 +54,45 @@ export default function WhoWeWorkWith() {
     if (!sectionEl) return;
 
     const DEBUG = isDebugMode();
-    const mm = gsap.matchMedia();
 
-    mm.add(
-      {
-        isDesktop: '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
-        isMobile: '(max-width: 1023px) and (prefers-reduced-motion: no-preference)',
-        isReduced: '(prefers-reduced-motion: reduce)'
-      },
-      (context) => {
-        const { isDesktop, isReduced } = context.conditions;
+    const animateContent = () => {
+      const cards = floatingLayerRef.current
+        ? Array.from(floatingLayerRef.current.children)
+        : [];
 
-        const animateContent = () => {
-          const cards = floatingLayerRef.current
-            ? Array.from(floatingLayerRef.current.children)
-            : [];
-
-          if (centerRef.current) {
-            gsap.fromTo(
-              centerRef.current,
-              { y: 30, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
-            );
-          }
-
-          if (cards.length > 0) {
-            gsap.fromTo(
-              cards,
-              { scale: 0.85, opacity: 0, y: 25 },
-              {
-                scale: 1,
-                opacity: 1,
-                y: 0,
-                duration: 0.7,
-                stagger: 0.12,
-                ease: 'power3.out'
-              }
-            );
-          }
-        };
-
-        if (isReduced) {
-          animateContent();
-          return;
-        }
-
-        if (isDesktop) {
-          createHitchTrigger({
-            sectionEl: sectionEl,
-            sectionName: 'WhoWeWorkWith',
-            holdDurationMs: 800,
-            onAnimate: animateContent
-          });
-        } else {
-          // Mobile: ScrollTrigger entrance reveal only
-          ScrollTrigger.create({
-            trigger: sectionEl,
-            start: 'top 75%',
-            markers: DEBUG,
-            invalidateOnRefresh: true,
-            onEnter: animateContent
-          });
-        }
+      if (centerRef.current) {
+        gsap.fromTo(
+          centerRef.current,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
+        );
       }
-    );
 
-    return () => mm.revert();
+      if (cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { scale: 0.85, opacity: 0, y: 25 },
+          {
+            scale: 1,
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power3.out'
+          }
+        );
+      }
+    };
+
+    const trigger = ScrollTrigger.create({
+      trigger: sectionEl,
+      start: 'top 75%',
+      markers: DEBUG,
+      invalidateOnRefresh: true,
+      onEnter: animateContent
+    });
+
+    return () => trigger.kill();
   }, []);
 
   const handleCardClick = (e, ind) => {

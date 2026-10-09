@@ -122,8 +122,12 @@ export default function MTMSection({ sequenceState }) {
         width: '100%',
         minHeight: '100svh',
         height: '100vh',
-        backgroundColor: '#E9E9E9',
-        color: '#181818',
+        backgroundColor: '#0F1017',
+        backgroundImage: 'url("/images/mtm-bg-2.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
+        color: '#FFFFFF',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -133,10 +137,23 @@ export default function MTMSection({ sequenceState }) {
         overflow: 'hidden'
       }}
     >
+      {/* Subtle dark backdrop overlay to guarantee text legibility over bg image */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(15, 16, 23, 0.45)',
+          pointerEvents: 'none',
+          zIndex: 1
+        }}
+      />
+
       <div
         ref={contentRef}
         className="mtm-content-container"
         style={{
+          position: 'relative',
+          zIndex: 2,
           textAlign: 'center',
           maxWidth: '1200px',
           margin: '0 auto',
@@ -153,7 +170,7 @@ export default function MTMSection({ sequenceState }) {
             fontWeight: 900,
             letterSpacing: '-0.04em',
             lineHeight: 0.92,
-            color: '#181818',
+            color: '#FFFFFF',
             textTransform: 'uppercase',
             margin: '0 0 1.5rem 0',
             opacity: 0,
@@ -173,7 +190,7 @@ export default function MTMSection({ sequenceState }) {
             fontSize: 'clamp(0.85rem, 1.4vw, 1.1rem)',
             fontWeight: 700,
             letterSpacing: '0.22em',
-            color: 'rgba(24, 24, 24, 0.65)',
+            color: 'rgba(255, 255, 255, 0.88)',
             textTransform: 'uppercase',
             margin: 0,
             opacity: 0,

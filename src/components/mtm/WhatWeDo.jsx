@@ -86,7 +86,7 @@ export default function WhatWeDo() {
               end: () => `+=${getScrollDistance()}`,
               pin: true,
               pinSpacing: true,
-              scrub: true,
+              scrub: 1,
               invalidateOnRefresh: true,
               onRefresh: () => {
                 if (window.lenis) {
@@ -454,3 +454,5 @@ export default function WhatWeDo() {
     </section>
   );
 }
+
+

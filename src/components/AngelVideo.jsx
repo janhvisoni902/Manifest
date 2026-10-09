@@ -41,7 +41,7 @@ export default function AngelVideo({ play, onEnded, maxDurationMs = 15000 }) {
       id="angel-video-stage"
       style={{
         position: 'relative',
-        width: '100%',
+        width: '100vw',
         height: '100vh',
         minHeight: '100svh',
         backgroundColor: '#000000',
@@ -61,7 +61,7 @@ export default function AngelVideo({ play, onEnded, maxDurationMs = 15000 }) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'var(--video-pos, center top)',
+          objectPosition: 'center center',
           filter: 'grayscale(100%) contrast(120%) brightness(0.88)',
           display: 'block'
         }}

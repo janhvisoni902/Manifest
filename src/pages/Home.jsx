@@ -7,7 +7,10 @@ import HelloSection from '../components/mtm/HelloSection';
 import WhatWeDo from '../components/mtm/WhatWeDo';
 import WhyChooseUs from '../components/WhyChooseUs';
 import WhoWeWorkWith from '../components/WhoWeWorkWith';
+import FoundersSection from '../components/FoundersSection';
 import Footer from '../components/Footer';
+import WelcomeModal from '../components/WelcomeModal';
+import StrategyModal from '../components/mtm/StrategyModal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,12 +26,13 @@ const prefersReducedMotion = () =>
  *   Intro (App overlay) -> Angel video -> MTM Section (#mtm, rises over video)
  *   -> Hello Section (#hello-section) -> What We Do (#what-we-do-section)
  *   -> Why Clients Choose Us (#why-choose-us) -> Who Do We Work With (#who-we-work-with)
- *   -> Footer
+ *   -> Founders Section (#founders-section) -> Footer
  */
 export default function Home({ sequenceState }) {
   const [phase, setPhase] = useState(() =>
     heroAlreadyPlayed || prefersReducedMotion() ? 'done' : 'video'
   );
+  const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
 
   const layerRef = useRef(null);
 
@@ -145,10 +149,26 @@ export default function Home({ sequenceState }) {
           {/* 06: Who Do We Work With */}
           <WhoWeWorkWith />
 
-          {/* 07: Footer */}
+          {/* 07: Founders Section */}
+          <FoundersSection />
+
+          {/* 08: Footer */}
           <Footer />
         </>
       )}
+
+      {/* Welcome / Sign-up Popup Modal (Triggers 2.5s after rise sequence settles) */}
+      <WelcomeModal
+        isSequenceFinished={phase === 'done'}
+        onScheduleCall={() => setIsStrategyModalOpen(true)}
+      />
+
+      {/* Strategy Call Booking Modal */}
+      <StrategyModal
+        isOpen={isStrategyModalOpen}
+        onClose={() => setIsStrategyModalOpen(false)}
+      />
     </div>
   );
 }
+
