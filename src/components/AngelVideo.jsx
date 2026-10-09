@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { assetUrl } from '../lib/router';
 
 /**
  * AngelVideo: full-viewport angel intro video (/videos/intro-reveal.mp4).
@@ -50,7 +51,7 @@ export default function AngelVideo({ play, onEnded, maxDurationMs = 15000 }) {
     >
       <video
         ref={videoRef}
-        src="/videos/intro-reveal.mp4"
+        src={assetUrl('/videos/intro-reveal.mp4')}
         muted
         playsInline
         preload="auto"

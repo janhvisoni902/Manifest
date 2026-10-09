@@ -27,6 +27,15 @@ function withBase(href) {
   return `${baseNoTrailing}/${href}`;
 }
 
+export function assetUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return BASE.endsWith('/') ? `${BASE}${cleanPath}` : `${BASE}/${cleanPath}`;
+}
+
 export function RouterProvider({ children }) {
   const [pathname, setPathname] = useState(() => normalizePath(window.location.pathname));
 

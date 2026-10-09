@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { playIntro } from '../../lib/animations';
+import { assetUrl } from '../../lib/router';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -123,7 +124,7 @@ export default function MTMSection({ sequenceState }) {
         minHeight: '100svh',
         height: '100vh',
         backgroundColor: '#0F1017',
-        backgroundImage: 'url("/images/mtm-bg-2.jpg")',
+        backgroundImage: `url("${assetUrl('/images/mtm-bg-2.jpg')}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { assetUrl } from '../../lib/router';
 
 export default function FullScreenShowcase() {
   return (
@@ -19,7 +20,7 @@ export default function FullScreenShowcase() {
       }}
     >
       <img
-        src="/assets/images/what-we-do-hero.jpg"
+        src={assetUrl('/assets/images/what-we-do-hero.jpg')}
         alt="WHAT WE DO — Manifest Tech Media"
         style={{
           width: '100%',

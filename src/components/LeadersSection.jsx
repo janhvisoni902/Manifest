@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from '../lib/router';
+import { Link, assetUrl } from '../lib/router';
 
 export default function LeadersSection() {
   const leaders = [
@@ -10,7 +10,7 @@ export default function LeadersSection() {
       role: 'Ex-Google · Performance Marketing & Growth',
       tag: 'FORBES 30 UNDER 30',
       bio: 'Engineered programmatic bidding protocols and AI-driven attribution models inside Google. Managed $200M+ in ad spend for 400+ businesses.',
-      imgSrc: '/images/why-us/why-us-1.jpg'
+      imgSrc: assetUrl('/images/why-us/why-us-1.jpg')
     },
     {
       id: '02',
@@ -18,7 +18,7 @@ export default function LeadersSection() {
       role: 'Ex-Ogilvy · Brand Strategy & Creative Direction',
       tag: 'FORBES 30 UNDER 30',
       bio: 'Crafted global brand narratives at Ogilvy. Bridges elite creative direction with direct-response psychological triggers and scalable funnel copy.',
-      imgSrc: '/images/why-us/why-us-5.jpg'
+      imgSrc: assetUrl('/images/why-us/why-us-5.jpg')
     }
   ];
 
