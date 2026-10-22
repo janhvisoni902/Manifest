@@ -228,7 +228,8 @@ export default function WhatWeDo() {
   return (
     <section
       ref={triggerRef}
-      id="what-we-do-section"
+      id="system"
+      data-section="what-we-do-section"
       style={{
         position: 'relative',
         width: '100%',
@@ -257,7 +258,7 @@ export default function WhatWeDo() {
       >
         {/* PANEL 01: WHAT WE DO HERO IMAGE */}
         <div
-          className="system-scene-panel"
+          className="system-scene-panel what-we-do-hero-panel"
           style={{
             flex: '0 0 100vw',
             width: '100vw',
@@ -287,7 +288,7 @@ export default function WhatWeDo() {
 
         {/* PANEL 02: THE SYSTEM INTRO */}
         <div
-          className="system-scene-panel"
+          className="system-scene-panel system-intro-panel"
           style={{
             flex: '0 0 100vw',
             width: '100vw',
@@ -346,7 +347,7 @@ export default function WhatWeDo() {
         {pillars.map((pillar) => (
           <div
             key={pillar.num}
-            className="system-scene-panel"
+            className="system-scene-panel pillar-panel"
             style={{
               flex: '0 0 100vw',
               width: '100vw',
@@ -360,6 +361,7 @@ export default function WhatWeDo() {
             }}
           >
             <div
+              className="pillar-header"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -368,25 +370,31 @@ export default function WhatWeDo() {
               }}
             >
               <span
+                className="pillar-num-badge"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.85rem',
                   fontWeight: 700,
                   letterSpacing: '0.2em',
                   color: 'rgba(255, 255, 255, 0.4)',
-                  display: 'block'
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}
               >
                 [{pillar.num} / {pillar.total}]
               </span>
               <span
+                className="pillar-divider"
                 style={{
                   width: '40px',
                   height: '1px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  flexShrink: 0
                 }}
               />
               <span
+                className="pillar-subtitle"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.78rem',
@@ -401,6 +409,7 @@ export default function WhatWeDo() {
             </div>
 
             <h3
+              className="pillar-title"
               style={{
                 fontFamily: 'var(--font-intro)',
                 fontSize: 'clamp(3rem, min(8.5vw, 14svh), 8rem)',
@@ -416,6 +425,7 @@ export default function WhatWeDo() {
             </h3>
 
             <p
+              className="pillar-desc"
               style={{
                 fontSize: 'clamp(1.1rem, 2vw, 1.6rem)',
                 fontWeight: 400,
@@ -432,7 +442,8 @@ export default function WhatWeDo() {
 
         {/* PANEL 08: THE REVENUE SYSTEM PROGRESSIVE FLOW + CTA */}
         <div
-          className="system-scene-panel"
+          id="five-stage-engine"
+          className="system-scene-panel revenue-system-panel"
           style={{
             flex: '0 0 100vw',
             width: '100vw',
@@ -445,6 +456,7 @@ export default function WhatWeDo() {
           }}
         >
           <span
+            className="revenue-system-eyebrow"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.85rem',
@@ -459,6 +471,7 @@ export default function WhatWeDo() {
             — THE REVENUE SYSTEM
           </span>
           <h3
+            className="revenue-system-title"
             style={{
               fontFamily: 'var(--font-intro)',
               fontSize: 'clamp(2rem, min(5.5vw, 9svh), 5rem)',
@@ -473,6 +486,7 @@ export default function WhatWeDo() {
           </h3>
 
           <div
+            className="revenue-stages-container"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -484,6 +498,7 @@ export default function WhatWeDo() {
             {revenueStages.map((stage) => (
               <div
                 key={stage.num}
+                className="revenue-stage-item"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '120px 180px 1fr',
@@ -494,6 +509,7 @@ export default function WhatWeDo() {
                 }}
               >
                 <span
+                  className="revenue-stage-num"
                   style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.75rem',
@@ -505,6 +521,7 @@ export default function WhatWeDo() {
                   {stage.num}
                 </span>
                 <span
+                  className="revenue-stage-title"
                   style={{
                     fontFamily: 'var(--font-intro)',
                     fontSize: '1.2rem',
@@ -516,6 +533,7 @@ export default function WhatWeDo() {
                   {stage.title}
                 </span>
                 <span
+                  className="revenue-stage-desc"
                   style={{
                     fontSize: '0.92rem',
                     color: 'rgba(255, 255, 255, 0.65)'
@@ -555,21 +573,139 @@ export default function WhatWeDo() {
 
       <style>{`
         @media (max-width: 767px), (prefers-reduced-motion: reduce) {
+          #system,
           #what-we-do-section {
             height: auto !important;
+            min-height: auto !important;
             overflow: visible !important;
           }
           .horizontal-scroll-track {
             flex-direction: column !important;
             width: 100% !important;
             height: auto !important;
+            min-height: auto !important;
             transform: none !important;
+            overflow: visible !important;
           }
           .system-scene-panel {
             width: 100% !important;
             height: auto !important;
-            min-height: 80vh !important;
-            padding: 5rem 1.5rem !important;
+            min-height: auto !important;
+            overflow: visible !important;
+            box-sizing: border-box !important;
+          }
+
+          /* A. Remove the grey hero image slide glitch on mobile */
+          .what-we-do-hero-panel {
+            display: none !important;
+          }
+
+          .system-intro-panel {
+            min-height: auto !important;
+            padding: 4rem 1.5rem 2.5rem !important;
+          }
+          .system-intro-panel h2 {
+            font-size: clamp(2.2rem, 9vw, 3.4rem) !important;
+            line-height: 1.02 !important;
+            margin-bottom: 1.5rem !important;
+          }
+          .system-intro-panel p {
+            font-size: 16px !important;
+            line-height: 1.55 !important;
+          }
+
+          /* B. Pillars styling on mobile */
+          .pillar-panel {
+            min-height: auto !important;
+            padding: 2rem 1.5rem !important;
+          }
+          .pillar-header {
+            gap: 0.75rem !important;
+            margin-bottom: 1rem !important;
+            flex-wrap: wrap !important;
+          }
+          .pillar-num-badge {
+            font-size: 13px !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            color: rgba(255, 255, 255, 0.75) !important;
+          }
+          .pillar-divider {
+            width: 24px !important;
+            flex-shrink: 0 !important;
+            background-color: rgba(255, 255, 255, 0.3) !important;
+          }
+          .pillar-subtitle {
+            font-size: 12px !important;
+            color: rgba(255, 255, 255, 0.78) !important;
+            letter-spacing: 0.14em !important;
+          }
+          .pillar-title {
+            font-size: clamp(2.4rem, 10vw, 3.8rem) !important;
+            line-height: 0.95 !important;
+            margin: 0 0 1.2rem 0 !important;
+          }
+          .pillar-desc {
+            font-size: 16px !important;
+            line-height: 1.55 !important;
+            color: rgba(255, 255, 255, 0.78) !important;
+          }
+
+          /* Prevent Conversion ("retention loops.") from touching "— THE REVENUE SYSTEM" */
+          .revenue-system-panel {
+            min-height: auto !important;
+            height: auto !important;
+            padding: 4.5rem 1.5rem 5rem !important;
+            margin-top: 2.5rem !important;
+          }
+          .revenue-system-eyebrow {
+            font-size: 13px !important;
+            margin-bottom: 0.75rem !important;
+            color: rgba(255, 255, 255, 0.75) !important;
+          }
+          .revenue-system-title {
+            font-size: clamp(1.8rem, 7.5vw, 2.8rem) !important;
+            line-height: 1.05 !important;
+            margin: 0 0 2rem 0 !important;
+          }
+
+          /* C. The Five-Stage Engine vertical stack on mobile */
+          .revenue-stages-container {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 1.8rem !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 2.5rem !important;
+          }
+          .revenue-stage-item {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.45rem !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+            padding-bottom: 1.5rem !important;
+          }
+          .revenue-stage-num {
+            font-size: 12px !important;
+            color: rgba(255, 255, 255, 0.65) !important;
+            letter-spacing: 0.16em !important;
+            margin-bottom: 0.15rem !important;
+          }
+          .revenue-stage-title {
+            font-size: 1.35rem !important;
+            line-height: 1.1 !important;
+            color: #FFFFFF !important;
+            letter-spacing: 0.03em !important;
+            margin-bottom: 0.2rem !important;
+          }
+          .revenue-stage-desc {
+            font-size: 16px !important;
+            line-height: 1.55 !important;
+            color: rgba(255, 255, 255, 0.78) !important;
+            width: 100% !important;
           }
         }
       `}</style>

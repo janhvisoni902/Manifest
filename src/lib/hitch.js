@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // Allowlist: What We Do horizontal scroll track only
-export const PIN_SECTIONS = ['#what-we-do-section'];
+export const PIN_SECTIONS = ['#system', '#what-we-do-section'];
 
 export const isDebugMode = () =>
   typeof window !== 'undefined' &&
