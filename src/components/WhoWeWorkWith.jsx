@@ -4,11 +4,19 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
-import { contactInfo } from '../data/contact';
 import { isDebugMode } from '../lib/hitch';
 import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const industryLines = {
+  'founders': 'You built the offer. We build the engine that sells it.',
+  'ecommerce': 'Ads and creative tied to profit, so growth stays profitable.',
+  'saas-ai': 'Demand that turns into demos and trials.',
+  'service-businesses': 'A steady flow of qualified calls, booked automatically.',
+  'coaches-consultants': 'Content, VSLs and funnels that fill your calendar.',
+  'dtc-brands': 'Creative and media buying that build a brand people buy again.'
+};
 
 export default function WhoWeWorkWith() {
   const { navigate } = useRouter();
@@ -197,7 +205,7 @@ export default function WhoWeWorkWith() {
           </p>
 
           <Link
-            href={`mailto:${contactInfo.email}`}
+            href="/book"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -215,16 +223,17 @@ export default function WhoWeWorkWith() {
               transition: 'all 0.3s ease'
             }}
           >
-            WORK WITH US →
+            Book a Strategy Call
           </Link>
         </motion.div>
 
         {/* Floating Industry Cards (Desktop Composition) */}
         <div ref={floatingLayerRef} className="desktop-floating-layer">
-          {manifestIndustriesData.map((ind) => {
+          {manifestIndustriesData.map((ind, index) => {
             const isHovered = hoveredId === ind.id;
             const isSelected = selectedIndustryId === ind.id;
             const isAnySelected = selectedIndustryId !== null;
+            const numStr = String(index + 1).padStart(2, '0');
 
             // Z-Index hierarchy: Selected (200) > Hovered (100) > Base (5)
             const cardZIndex = isSelected ? 200 : isHovered ? 100 : 5;
@@ -312,22 +321,24 @@ export default function WhoWeWorkWith() {
                         color: 'rgba(255, 255, 255, 0.45)'
                       }}
                     >
-                      [{ind.num}]
+                      [{numStr}]
                     </span>
-                    <span
-                      style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.1em',
-                        color: '#FFFFFF',
-                        backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '9999px',
-                        textTransform: 'uppercase'
-                      }}
-                    >
-                      {ind.metric}
-                    </span>
+                    {ind.metric && (
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.1em',
+                          color: '#FFFFFF',
+                          backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                          padding: '0.2rem 0.6rem',
+                          borderRadius: '9999px',
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        {ind.metric}
+                      </span>
+                    )}
                   </div>
 
                   <h3
@@ -346,30 +357,14 @@ export default function WhoWeWorkWith() {
 
                   <p
                     style={{
-                      fontSize: '0.82rem',
-                      lineHeight: 1.4,
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      margin: '0 0 1rem 0'
+                      fontSize: '0.84rem',
+                      lineHeight: 1.45,
+                      color: 'rgba(255, 255, 255, 0.72)',
+                      margin: 0
                     }}
                   >
-                    {ind.desc}
+                    {industryLines[ind.id] || ind.desc}
                   </p>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: '0.75rem',
-                      fontFamily: 'var(--font-mono, monospace)',
-                      fontWeight: 800,
-                      letterSpacing: '0.14em',
-                      color: '#FFFFFF',
-                      textTransform: 'uppercase'
-                    }}
-                  >
-                    {isSelected ? 'CLICK TO EXPLORE →' : 'LEARN MORE →'}
-                  </div>
                 </motion.div>
               </motion.div>
             );

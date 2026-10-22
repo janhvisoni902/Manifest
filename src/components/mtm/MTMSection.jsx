@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { playIntro } from '../../lib/animations';
-import { assetUrl } from '../../lib/router';
+import { Link, assetUrl } from '../../lib/router';
 import { scaleScrub } from '../../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -202,6 +202,71 @@ export default function MTMSection({ sequenceState }) {
         >
           REVENUE ARCHITECTURE · ENTERPRISE GROWTH ENGINES
         </p>
+
+        <p
+          className="animate-item"
+          style={{
+            fontFamily: 'var(--font-body, sans-serif)',
+            fontSize: 'clamp(1rem, 1.4vw, 1.25rem)',
+            lineHeight: 1.6,
+            color: 'rgba(255, 255, 255, 0.78)',
+            maxWidth: '780px',
+            margin: '1.8rem auto 2.2rem auto',
+            opacity: 0,
+            transform: 'translateY(30px)',
+            willChange: 'transform, opacity'
+          }}
+        >
+          We build and run revenue systems for US businesses: ads, funnels, CRM and AI follow-up, working as one engine that turns ad spend into booked sales calls.
+        </p>
+
+        <div
+          className="animate-item"
+          style={{
+            opacity: 0,
+            transform: 'translateY(30px)',
+            willChange: 'transform, opacity'
+          }}
+        >
+          <Link
+            href="/book"
+            className="nav-cta-btn"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '1rem 2.5rem',
+              borderRadius: '9999px',
+              backgroundColor: '#FFFFFF',
+              color: '#0F1017',
+              border: '1px solid #FFFFFF',
+              fontFamily: 'var(--font-mono, monospace)',
+              fontSize: '0.88rem',
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            <span>Book a Strategy Call</span>
+            <svg className="cta-arrow" viewBox="0 0 10 10" style={{ width: '12px', height: '12px' }}>
+              <path d="M2 1 h5 v5 M7 1 L1 7" fill="none" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </Link>
+          <p
+            style={{
+              fontFamily: 'var(--font-body, sans-serif)',
+              fontSize: '0.85rem',
+              color: 'rgba(255, 255, 255, 0.6)',
+              margin: '0.85rem 0 0 0',
+              letterSpacing: '0.02em'
+            }}
+          >
+            Free strategy call. We'll show you where your funnel is leaking.
+          </p>
+        </div>
       </div>
     </section>
   );

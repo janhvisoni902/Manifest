@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, assetUrl } from '../lib/router';
-import { contactInfo } from '../data/contact';
 import { isDebugMode } from '../lib/hitch';
 import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
 import VideoTestimonial from './VideoTestimonial';
@@ -92,6 +91,9 @@ export default function WhyChooseUs() {
   const cardsRef = useRef(null);
   const ctaRef = useRef(null);
 
+  // Toggle flag to easily re-enable Testimonials & Results proof cards
+  const SHOW_PROOF_CARDS = false;
+
   const cards = [
     {
       num: '01',
@@ -99,34 +101,38 @@ export default function WhyChooseUs() {
       title: 'REVENUE SYSTEM',
       desc: 'The system behind sustainable growth.',
       linkText: 'EXPLORE →',
-      href: '/system',
+      href: '/services',
       comment: 'Revenue System: abstract dashboard or growth chart'
     },
+    ...(SHOW_PROOF_CARDS
+      ? [
+          {
+            num: '02',
+            id: 'testimonials',
+            title: 'TESTIMONIALS',
+            desc: 'What our clients say.',
+            linkText: 'EXPLORE →',
+            href: '/case-studies',
+            comment: 'Testimonials: client portrait or quote graphic (only with permission)'
+          },
+          {
+            num: '03',
+            id: 'results',
+            title: 'RESULTS',
+            desc: 'Growth you can measure.',
+            linkText: 'EXPLORE →',
+            href: '/case-studies',
+            comment: 'Results: charts or metrics'
+          }
+        ]
+      : []),
     {
-      num: '02',
-      id: 'testimonials',
-      title: 'TESTIMONIALS',
-      desc: 'What our clients say.',
-      linkText: 'EXPLORE →',
-      href: '/case-studies',
-      comment: 'Testimonials: client portrait or quote graphic (only with permission)'
-    },
-    {
-      num: '03',
-      id: 'results',
-      title: 'RESULTS',
-      desc: 'Growth you can measure.',
-      linkText: 'EXPLORE →',
-      href: '/case-studies',
-      comment: 'Results: charts or metrics'
-    },
-    {
-      num: '04',
+      num: SHOW_PROOF_CARDS ? '04' : '02',
       id: 'why-us',
       title: 'WHY US',
       desc: 'Manifest Tech Media focuses on client relationships and results. We always deliver substance, not false promises, ensuring we maximize your budget, so you get the most return on investment (ROI).',
       linkText: 'EXPLORE →',
-      href: '/founders',
+      href: '/about',
       comment: 'Why Us: team or workspace'
     }
   ];
@@ -235,15 +241,16 @@ export default function WhyChooseUs() {
           </p>
         </div>
 
-        {/* FOUR CARDS GRID */}
+        {/* CARDS GRID */}
         <div
           ref={cardsRef}
           className="why-choose-us-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1.8rem',
-            marginBottom: '7rem'
+            gridTemplateColumns: cards.length === 2 ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+            maxWidth: cards.length === 2 ? '960px' : '100%',
+            margin: '0 auto 7rem auto',
+            gap: cards.length === 2 ? '3rem' : '1.8rem'
           }}
         >
           {cards.map((card) => (
@@ -376,7 +383,7 @@ export default function WhyChooseUs() {
           </p>
 
           <Link
-            href={`mailto:${contactInfo.email}`}
+            href="/book"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -394,7 +401,7 @@ export default function WhyChooseUs() {
               transition: 'all 0.3s ease'
             }}
           >
-            START A PROJECT →
+            Book a Strategy Call
           </Link>
         </div>
       </div>

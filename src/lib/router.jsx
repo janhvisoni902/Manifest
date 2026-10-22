@@ -69,14 +69,6 @@ export function RouterProvider({ children }) {
       return;
     }
 
-    // Handle /book navigation: open booking modal or navigate
-    if (normalizePath(href) === '/book') {
-      if (typeof window !== 'undefined' && window.__openBookingModal) {
-        window.__openBookingModal();
-        return;
-      }
-    }
-
     // Scroll to top instantly before loading new page content
     window.scrollTo(0, 0);
     if (window.lenis) {

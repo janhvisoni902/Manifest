@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { contactInfo } from '../data/contact';
 import { Link } from '../lib/router';
 import { isDebugMode } from '../lib/hitch';
 import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
@@ -46,14 +45,16 @@ export default function FoundersSection() {
     {
       initials: 'OK',
       name: 'Oshim Kher',
+      title: 'Co-founder & Chairman',
       role: 'EX-GOOGLE · PERFORMANCE MARKETING · FORBES 30U30',
-      bio: "Oshim spent over half a decade inside Google's core ad algorithms team, engineering programmatic bidding protocols and AI attribution models. Having managed over $200M+ in ad spend for 400+ businesses, he turns ad spend into predictable revenue systems.",
+      bio: "Oshim spent over half a decade inside Google's core ad algorithms team, engineering programmatic bidding protocols and AI attribution models. Having managed $200M+ in ad spend for 400+ businesses, he turns ad spend into predictable revenue systems.",
       stat1: { value: '$200M+', label: 'AD SPEND MANAGED' },
-      stat2: { value: '400+', label: 'CLIENTS SCALED' }
+      stat2: { value: '400+', label: 'BUSINESSES SERVED' }
     },
     {
       initials: 'AS',
       name: 'Aishwarya Soni',
+      title: 'Co-founder & CEO',
       role: 'EX-OGILVY · BRAND STRATEGY · FORBES 30U30',
       bio: 'Aishwarya began her career at Ogilvy shaping global brand narratives and campaign positioning. At MTM, she bridges cinematic brand direction with direct-response psychological triggers — crafting high-converting VSLs and brand authority.',
       stat1: { value: 'OGILVY', label: 'BRAND LEGACY' },
@@ -208,6 +209,18 @@ export default function FoundersSection() {
                     >
                       {f.name}
                     </h3>
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-mono, monospace)',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        color: '#FFFFFF',
+                        marginBottom: '0.35rem'
+                      }}
+                    >
+                      {f.title}
+                    </div>
                     <span
                       style={{
                         fontFamily: 'var(--font-mono, monospace)',
@@ -337,9 +350,8 @@ export default function FoundersSection() {
             Direct 1-on-1 strategy sessions with Forbes 30U30 honorees to analyze your capital allocation and scale backend margins.
           </p>
 
-          {/* OVERRIDE: Replace mailto: with Calendly link e.g., https://calendly.com/manifesttechmedia/executive-call */}
           <Link
-            href={`mailto:${contactInfo.email}`}
+            href="/book"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -357,7 +369,7 @@ export default function FoundersSection() {
               transition: 'all 0.3s ease'
             }}
           >
-            SCHEDULE EXECUTIVE CALL →
+            Book a Strategy Call
           </Link>
         </div>
       </div>

@@ -16,6 +16,7 @@ import Home from './pages/Home';
 import CaseStudiesPage from './pages/CaseStudiesPage';
 import SystemPage from './pages/SystemPage';
 import FoundersPage from './pages/FoundersPage';
+import BookPage from './pages/BookPage';
 
 import IndustryDetailPage from './pages/IndustryDetailPage';
 
@@ -207,8 +208,12 @@ function AppContent() {
     }
 
     switch (path) {
+      case '/book':
+        return <BookPage />;
+      case '/services':
       case '/system':
         return <SystemPage />;
+      case '/about':
       case '/founders':
         return <FoundersPage />;
       case '/case-studies':

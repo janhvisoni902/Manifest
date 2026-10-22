@@ -96,7 +96,7 @@ export default function Hero({ onScheduleCall }) {
             fontWeight: 400
           }}
         >
-          Stop treating ad spend as an expense. We turn paid traffic into predictable, scalable revenue — aligning every dollar with real backend growth.
+          We build and run revenue systems for US businesses: ads, funnels, CRM and AI follow-up, working as one engine that turns ad spend into booked sales calls.
         </p>
 
         {/* CTA Button */}
@@ -131,6 +131,17 @@ export default function Hero({ onScheduleCall }) {
               <path d="M2 1 h5 v5 M7 1 L1 7" />
             </svg>
           </Link>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.85rem',
+              color: 'rgba(255, 255, 255, 0.6)',
+              margin: '0.85rem 0 0 0',
+              letterSpacing: '0.02em'
+            }}
+          >
+            Free strategy call. We'll show you where your funnel is leaking.
+          </p>
         </div>
 
         {/* Stat Row */}

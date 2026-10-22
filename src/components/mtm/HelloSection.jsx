@@ -20,7 +20,7 @@ export default function HelloSection() {
   ];
 
   const statementText =
-    'We help global brands turn paid traffic into predictable, scalable revenue — aligning every dollar with real backend growth.';
+    'We help US businesses turn paid traffic into predictable, scalable revenue — aligning every dollar with real backend growth.';
   const statementWords = statementText.split(' ');
 
   useEffect(() => {
