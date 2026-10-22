@@ -8,7 +8,7 @@ import { assetUrl } from '../lib/router';
  * 1. Black background (#000000)
  * 2. Small centered portal window displaying angel video (/videos/intro-reveal.mp4)
  * 3. Automatic GSAP window expansion (24vw x 50vh -> 100vw x 100vh)
- * 4. Intensifying white light beam & full-screen white bloom flash (#E9E9E9)
+ * 4. Intensifying white light beam & full-screen white bloom flash (#E2E2E2)
  * 5. Instant handoff at peak white bloom to the working Home section (CanvasHero 300-frame white angel sequence)
  */
 export default function VideoReveal({ isActive, onFinished }) {
@@ -37,7 +37,7 @@ export default function VideoReveal({ isActive, onFinished }) {
       if (hasEnded) return;
       hasEnded = true;
 
-      // Immediately hide overlay while whiteBloom is at opacity 1.0 (#E9E9E9)
+      // Immediately hide overlay while whiteBloom is at opacity 1.0 (#E2E2E2)
       // to prevent fading whiteBloom down and exposing the dark video frame underneath.
       if (overlay) overlay.style.display = 'none';
       if (onFinished) onFinished();
@@ -99,7 +99,7 @@ export default function VideoReveal({ isActive, onFinished }) {
       0.4
     );
 
-    // White light beam blooms into full-screen studio light grey (#E9E9E9) (2.2s -> 3.0s)
+    // White light beam blooms into full-screen studio light grey (#E2E2E2) (2.2s -> 3.0s)
     tl.to(
       beamGlow,
       {
@@ -222,13 +222,13 @@ export default function VideoReveal({ isActive, onFinished }) {
         />
       </div>
 
-      {/* Full-Screen Blinding White Bloom Flash Overlay (Matches CanvasHero #E9E9E9) */}
+      {/* Full-Screen Blinding White Bloom Flash Overlay (Matches CanvasHero #E2E2E2) */}
       <div
         ref={whiteBloomRef}
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: '#E9E9E9',
+          backgroundColor: '#E2E2E2',
           opacity: 0,
           pointerEvents: 'none',
           zIndex: 20,

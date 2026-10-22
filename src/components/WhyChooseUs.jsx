@@ -1,11 +1,90 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link, assetUrl } from '../lib/router';
 import { contactInfo } from '../data/contact';
 import { isDebugMode } from '../lib/hitch';
+import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
+import VideoTestimonial from './VideoTestimonial';
+import { testimonialsData } from '../data/testimonialsData';
 
 gsap.registerPlugin(ScrollTrigger);
+
+function CardImageSlot({ id }) {
+  const [activeSrc, setActiveSrc] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const extensions = ['webp', 'jpg', 'png'];
+
+    const checkCandidate = (index) => {
+      if (index >= extensions.length) return;
+      const ext = extensions[index];
+      const src = assetUrl(`/section-images/${id}.${ext}`);
+      const img = new Image();
+      img.onload = () => {
+        if (isMounted) setActiveSrc(src);
+      };
+      img.onerror = () => {
+        checkCandidate(index + 1);
+      };
+      img.src = src;
+    };
+
+    checkCandidate(0);
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '260px',
+        backgroundColor: '#16171E',
+        background: 'linear-gradient(135deg, #14151B 0%, #1E202A 100%)',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        marginBottom: '1.2rem',
+        position: 'relative'
+      }}
+      aria-hidden="true"
+    >
+      {activeSrc ? (
+        <img
+          src={activeSrc}
+          alt=""
+          loading="lazy"
+          width="100%"
+          height="260"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: 'block',
+            transition: 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)'
+          }}
+          className="card-image-zoom"
+        />
+      ) : (
+        /* Blank placeholder block in site's existing dark palette */
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#16171E',
+            background: 'linear-gradient(135deg, #14151B 0%, #1E202A 100%)'
+          }}
+          alt=""
+          aria-hidden="true"
+          data-placeholder={`${id}-image-placeholder`}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function WhyChooseUs() {
   const sectionRef = useRef(null);
@@ -16,35 +95,39 @@ export default function WhyChooseUs() {
   const cards = [
     {
       num: '01',
+      id: 'revenue-system',
       title: 'REVENUE SYSTEM',
       desc: 'The system behind sustainable growth.',
       linkText: 'EXPLORE →',
       href: '/system',
-      imgSrc: assetUrl('/frames/frame_0001.jpg')
+      comment: 'Revenue System: abstract dashboard or growth chart'
     },
     {
       num: '02',
+      id: 'testimonials',
       title: 'TESTIMONIALS',
       desc: 'What our clients say.',
       linkText: 'EXPLORE →',
       href: '/case-studies',
-      imgSrc: assetUrl('/frames/frame_0050.jpg')
+      comment: 'Testimonials: client portrait or quote graphic (only with permission)'
     },
     {
       num: '03',
+      id: 'results',
       title: 'RESULTS',
       desc: 'Growth you can measure.',
       linkText: 'EXPLORE →',
       href: '/case-studies',
-      imgSrc: assetUrl('/frames/frame_0100.jpg')
+      comment: 'Results: charts or metrics'
     },
     {
       num: '04',
+      id: 'why-us',
       title: 'WHY US',
-      desc: 'Strategy built around the whole business.',
+      desc: 'Manifest Tech Media focuses on client relationships and results. We always deliver substance, not false promises, ensuring we maximize your budget, so you get the most return on investment (ROI).',
       linkText: 'EXPLORE →',
       href: '/founders',
-      imgSrc: assetUrl('/frames/frame_0200.jpg')
+      comment: 'Why Us: team or workspace'
     }
   ];
 
@@ -59,28 +142,46 @@ export default function WhyChooseUs() {
         gsap.fromTo(
           heroRef.current.children,
           { y: 35, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out' }
+          {
+            y: 0,
+            opacity: 1,
+            duration: revealDuration(0.7),
+            stagger: revealStagger(0.12),
+            ease: softerEase('power3.out')
+          }
         );
       }
       if (cardsRef.current) {
         gsap.fromTo(
           cardsRef.current.children,
           { y: 40, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+          {
+            y: 0,
+            opacity: 1,
+            duration: revealDuration(0.7),
+            stagger: revealStagger(0.1),
+            ease: softerEase('power3.out')
+          }
         );
       }
       if (ctaRef.current) {
         gsap.fromTo(
           ctaRef.current.children,
           { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+          {
+            y: 0,
+            opacity: 1,
+            duration: revealDuration(0.7),
+            stagger: revealStagger(0.1),
+            ease: softerEase('power3.out')
+          }
         );
       }
     };
 
     const trigger = ScrollTrigger.create({
       trigger: el,
-      start: 'top 75%',
+      start: 'top 70%',
       markers: DEBUG,
       invalidateOnRefresh: true,
       onEnter: animateContent
@@ -97,7 +198,7 @@ export default function WhyChooseUs() {
         position: 'relative',
         zIndex: 2,
         width: '100%',
-        backgroundColor: '#E9E9E9',
+        backgroundColor: '#DEDEDE',
         color: '#181818',
         padding: '140px 2.5rem 160px',
         boxSizing: 'border-box'
@@ -156,31 +257,25 @@ export default function WhyChooseUs() {
                 willChange: 'transform, opacity'
               }}
             >
-              {/* Card Image Area */}
-              <div
-                style={{
-                  width: '100%',
-                  height: '260px',
-                  backgroundColor: '#181818',
-                  overflow: 'hidden',
-                  marginBottom: '1.2rem',
-                  position: 'relative'
-                }}
-              >
-                <img
-                  src={card.imgSrc}
-                  alt={card.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    filter: 'grayscale(100%) contrast(108%)',
-                    transition: 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)'
-                  }}
-                  className="card-image-zoom"
-                />
-              </div>
+              {/* Card Image Slot */}
+              {card.id === 'revenue-system' && (
+                /* Revenue System: abstract dashboard or growth chart */
+                <CardImageSlot id={card.id} />
+              )}
+              {card.id === 'testimonials' && (
+                /* Testimonials: client portrait or quote graphic (only with permission) */
+                <div style={{ marginBottom: '1.2rem' }}>
+                  <VideoTestimonial testimonial={testimonialsData[0]} />
+                </div>
+              )}
+              {card.id === 'results' && (
+                /* Results: charts or metrics */
+                <CardImageSlot id={card.id} />
+              )}
+              {card.id === 'why-us' && (
+                /* Why Us: team or workspace */
+                <CardImageSlot id={card.id} />
+              )}
 
               {/* Card Content */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>

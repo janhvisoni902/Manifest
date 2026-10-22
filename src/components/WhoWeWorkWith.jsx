@@ -6,6 +6,7 @@ import { Link, useRouter } from '../lib/router';
 import { manifestIndustriesData } from '../data/manifestIndustriesData';
 import { contactInfo } from '../data/contact';
 import { isDebugMode } from '../lib/hitch';
+import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,7 +65,12 @@ export default function WhoWeWorkWith() {
         gsap.fromTo(
           centerRef.current,
           { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
+          {
+            y: 0,
+            opacity: 1,
+            duration: revealDuration(0.7),
+            ease: softerEase('power3.out')
+          }
         );
       }
 
@@ -76,9 +82,9 @@ export default function WhoWeWorkWith() {
             scale: 1,
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.12,
-            ease: 'power3.out'
+            duration: revealDuration(0.7),
+            stagger: revealStagger(0.12),
+            ease: softerEase('power3.out')
           }
         );
       }
@@ -86,7 +92,7 @@ export default function WhoWeWorkWith() {
 
     const trigger = ScrollTrigger.create({
       trigger: sectionEl,
-      start: 'top 75%',
+      start: 'top 70%',
       markers: DEBUG,
       invalidateOnRefresh: true,
       onEnter: animateContent
@@ -121,7 +127,7 @@ export default function WhoWeWorkWith() {
         position: 'relative',
         zIndex: 2,
         width: '100%',
-        backgroundColor: '#E9E9E9',
+        backgroundColor: '#E2E2E2',
         color: '#181818',
         padding: '140px 2rem 160px',
         boxSizing: 'border-box',

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '../../lib/router';
 
 export default function Hero({ onScheduleCall }) {
   return (
@@ -100,8 +101,14 @@ export default function Hero({ onScheduleCall }) {
 
         {/* CTA Button */}
         <div style={{ marginBottom: '4.5rem' }}>
-          <button
-            onClick={onScheduleCall}
+          <Link
+            href="/book"
+            onClick={(e) => {
+              if (onScheduleCall) {
+                e.preventDefault();
+                onScheduleCall();
+              }
+            }}
             className="nav-cta-btn"
             style={{
               borderRadius: '9999px',
@@ -112,14 +119,18 @@ export default function Hero({ onScheduleCall }) {
               backgroundColor: '#FFFFFF',
               color: '#0F1017',
               border: '1px solid #FFFFFF',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
-            <span>Schedule A Strategy Call</span>
+            <span>Book a Strategy Call</span>
             <svg className="cta-arrow" viewBox="0 0 10 10" style={{ width: '12px', height: '12px' }}>
               <path d="M2 1 h5 v5 M7 1 L1 7" />
             </svg>
-          </button>
+          </Link>
         </div>
 
         {/* Stat Row */}

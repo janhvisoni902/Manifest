@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useRouter } from '../lib/router';
+import { useIntro } from '../lib/introContext';
 
 export default function Navbar({ onScheduleCall }) {
   const { pathname } = useRouter();
+  const { isIntroPlaying } = useIntro();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navVisible, setNavVisible] = useState(true);
 
@@ -58,6 +60,10 @@ export default function Navbar({ onScheduleCall }) {
       }
     };
   }, []);
+
+  if (isIntroPlaying) {
+    return null;
+  }
 
   const navLinks = [
     { label: 'Home', target: '/' },
@@ -132,9 +138,15 @@ export default function Navbar({ onScheduleCall }) {
             border: '1px solid rgba(0, 0, 0, 0.08)'
           }}
         >
-          {/* 1. Schedule Strategy Call Button */}
-          <button
-            onClick={onScheduleCall}
+          {/* 1. Book a Strategy Call Button */}
+          <Link
+            href="/book"
+            onClick={(e) => {
+              if (onScheduleCall) {
+                e.preventDefault();
+                onScheduleCall();
+              }
+            }}
             style={{
               borderRadius: '9999px',
               padding: '0.6rem 1.4rem',
@@ -146,6 +158,7 @@ export default function Navbar({ onScheduleCall }) {
               border: 'none',
               cursor: 'pointer',
               textTransform: 'uppercase',
+              textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
@@ -154,11 +167,11 @@ export default function Navbar({ onScheduleCall }) {
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#5c1a24')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7A2331')}
           >
-            <span>Schedule A Strategy Call</span>
+            <span>Book a Strategy Call</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M2 1 h5 v5 M7 1 L1 7" />
             </svg>
-          </button>
+          </Link>
 
           {/* 2. Desktop Nav Links */}
           <ul
@@ -259,6 +272,32 @@ export default function Navbar({ onScheduleCall }) {
               </Link>
             );
           })}
+
+          <Link
+            href="/book"
+            onClick={(e) => {
+              setMobileMenuOpen(false);
+              if (onScheduleCall) {
+                e.preventDefault();
+                onScheduleCall();
+              }
+            }}
+            style={{
+              marginTop: '0.5rem',
+              textAlign: 'center',
+              textDecoration: 'none',
+              backgroundColor: '#7A2331',
+              color: '#ffffff',
+              padding: '0.8rem 1.2rem',
+              borderRadius: '9999px',
+              fontSize: '0.85rem',
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase'
+            }}
+          >
+            Book a Strategy Call
+          </Link>
         </div>
       )}
 

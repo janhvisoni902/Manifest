@@ -28,13 +28,32 @@ const prefersReducedMotion = () =>
  *   -> Why Clients Choose Us (#why-choose-us) -> Who Do We Work With (#who-we-work-with)
  *   -> Founders Section (#founders-section) -> Footer
  */
-export default function Home({ sequenceState }) {
-  const [phase, setPhase] = useState(() =>
-    heroAlreadyPlayed || prefersReducedMotion() ? 'done' : 'video'
-  );
+export default function Home({ sequenceState, onSkipAll }) {
+  const [phase, setPhase] = useState(() => {
+    const isReduced = prefersReducedMotion();
+    const hasSeen = (() => {
+      try {
+        return sessionStorage.getItem('intro:seen') === '1';
+      } catch {
+        return false;
+      }
+    })();
+    return heroAlreadyPlayed || isReduced || hasSeen ? 'done' : 'video';
+  });
   const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
 
   const layerRef = useRef(null);
+
+  const skipToHero = useCallback(() => {
+    try {
+      sessionStorage.setItem('intro:seen', '1');
+    } catch {
+      /* ignore */
+    }
+    heroAlreadyPlayed = true;
+    setPhase('done');
+    if (onSkipAll) onSkipAll();
+  }, [onSkipAll]);
 
   const startRise = useCallback(() => {
     setPhase((p) => (p === 'video' ? 'rising' : p));
@@ -118,13 +137,13 @@ export default function Home({ sequenceState }) {
         width: '100%',
         maxWidth: '100%',
         overflowX: 'clip',
-        backgroundColor: '#E9E9E9'
+        backgroundColor: '#DEDEDE'
       }}
     >
       {/* 01: Angel video (fixed behind the rising MTM layer until the rise completes) */}
       {phase !== 'done' && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1 }}>
-          <AngelVideo play={sequenceState === 'completed'} onEnded={startRise} />
+          <AngelVideo play={sequenceState === 'completed'} onEnded={startRise} onSkip={skipToHero} />
         </div>
       )}
 

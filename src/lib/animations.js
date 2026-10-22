@@ -1,4 +1,5 @@
 import gsap from 'gsap';
+import { revealDuration, revealStagger, softerEase } from './scrollPace';
 
 /**
  * Shared entrance animation helper for MTM and Hello sections.
@@ -35,9 +36,9 @@ export function playIntro(el, options = {}) {
     {
       y: 0,
       opacity: 1,
-      duration: 0.8,
-      stagger: 0.15,
-      ease: 'power3.out',
+      duration: revealDuration(0.8),
+      stagger: revealStagger(0.15),
+      ease: softerEase('power3.out'),
       delay: options.delay || 0,
       onComplete: options.onComplete
     }

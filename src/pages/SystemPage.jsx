@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Link } from '../lib/router';
+import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,9 +50,9 @@ export default function SystemPage() {
           gsap.from(heroRef.current.querySelectorAll('.hero-animate'), {
             y: 30,
             opacity: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: 'power3.out'
+            duration: revealDuration(0.8),
+            stagger: revealStagger(0.15),
+            ease: softerEase('power3.out')
           });
         }
       }
@@ -322,10 +324,8 @@ export default function SystemPage() {
             Build the system.
           </h2>
 
-          <a
-            href="https://calendly.com"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/book"
             style={{
               display: 'inline-block',
               backgroundColor: '#7A2331',
@@ -342,8 +342,8 @@ export default function SystemPage() {
             }}
             className="cta-button-hover"
           >
-            SCHEDULE A STRATEGY CALL
-          </a>
+            Book a Strategy Call
+          </Link>
 
         </div>
       </section>

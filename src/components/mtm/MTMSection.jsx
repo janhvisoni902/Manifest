@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { playIntro } from '../../lib/animations';
 import { assetUrl } from '../../lib/router';
+import { scaleScrub } from '../../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -102,7 +103,7 @@ export default function MTMSection({ sequenceState }) {
             trigger: el,
             start: 'top top',
             end: 'bottom top',
-            scrub: 0.5,
+            scrub: scaleScrub(0.5),
             markers: DEBUG,
             invalidateOnRefresh: true
           }

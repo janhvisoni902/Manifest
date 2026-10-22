@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { anchorDuration } from './scrollPace';
 
 const RouterContext = createContext(null);
 const BASE = import.meta.env.BASE_URL || '/';
@@ -52,13 +53,28 @@ export function RouterProvider({ children }) {
     if (href.startsWith('#')) {
       const el = document.querySelector(href);
       if (el) {
+        const targetY = el.getBoundingClientRect().top + window.scrollY;
+        const dist = Math.abs(targetY - window.scrollY);
+        const dur = anchorDuration(dist);
         if (window.lenis) {
-          window.lenis.scrollTo(el);
+          window.lenis.scrollTo(el, {
+            duration: dur,
+            easing: (t) => 1 - Math.pow(1 - t, 3),
+            lock: false
+          });
         } else {
           el.scrollIntoView({ behavior: 'smooth' });
         }
       }
       return;
+    }
+
+    // Handle /book navigation: open booking modal or navigate
+    if (normalizePath(href) === '/book') {
+      if (typeof window !== 'undefined' && window.__openBookingModal) {
+        window.__openBookingModal();
+        return;
+      }
     }
 
     // Scroll to top instantly before loading new page content

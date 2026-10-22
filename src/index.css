@@ -1,6 +1,6 @@
 :root {
   /* Colors */
-  --color-bg: #e9e9e9;        /* studio light grey matching photo frame background */
+  --color-bg: #DEDEDE;        /* studio light grey matching photo frame background */
   --color-text: #181818;      /* dark neutral */
   --color-accent-burgundy: #7A2331;
   --color-accent-gold: #B08D57;
@@ -359,7 +359,7 @@ a {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background-color: #e9e9e9;
+  background-color: #e2e2e2;
   z-index: 1;
 }
 
@@ -371,7 +371,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e9e9e9;
+  background-color: #e2e2e2;
 }
 
 #frame-canvas {

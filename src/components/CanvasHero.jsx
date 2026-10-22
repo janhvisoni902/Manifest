@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { assetUrl } from '../lib/router';
+import { sceneFactor, scaleScrub } from '../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -59,7 +60,7 @@ export default function CanvasHero({ sequenceState }) {
     }
 
     // Light grey studio background
-    ctx.fillStyle = '#E9E9E9';
+    ctx.fillStyle = '#E2E2E2';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Subtle ambient lighting behind angel silhouette
@@ -70,7 +71,7 @@ export default function CanvasHero({ sequenceState }) {
     );
     ambientGlow.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
     ambientGlow.addColorStop(0.5, 'rgba(240, 240, 240, 0.25)');
-    ambientGlow.addColorStop(1, 'rgba(233, 233, 233, 0)');
+    ambientGlow.addColorStop(1, 'rgba(226, 226, 226, 0)');
 
     ctx.fillStyle = ambientGlow;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -166,8 +167,8 @@ export default function CanvasHero({ sequenceState }) {
             pin: sectionRef.current,
             pinSpacing: true,
             start: 'top top',
-            end: '+=350vh',
-            scrub: 1.2,
+            end: () => `+=${350 * sceneFactor()}vh`,
+            scrub: scaleScrub(1.2),
             onRefresh: (self) => {
               const progress = Math.min(1.0, Math.max(0.0, self.progress || 0));
               const frameIndex = Math.min(CONFIG.frameCount - 1, Math.floor(progress * (CONFIG.frameCount - 1)));
@@ -284,12 +285,12 @@ export default function CanvasHero({ sequenceState }) {
           position: 'relative',
           width: '100%',
           height: '100vh',
-          backgroundColor: '#E9E9E9',
+          backgroundColor: '#E2E2E2',
           overflow: 'hidden',
           zIndex: 1
         }}
       >
-        <div className="canvas-wrapper" style={{ position: 'absolute', inset: 0, backgroundColor: '#E9E9E9' }}>
+        <div className="canvas-wrapper" style={{ position: 'absolute', inset: 0, backgroundColor: '#E2E2E2' }}>
           <canvas ref={canvasRef} id="frame-canvas" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
 
           {/* Phase 2: MANIFEST Typography Overlay */}

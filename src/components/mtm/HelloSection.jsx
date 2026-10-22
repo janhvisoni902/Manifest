@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { isDebugMode } from '../../lib/hitch';
+import { sceneFactor, scaleScrub } from '../../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,7 +49,7 @@ export default function HelloSection() {
 
         // Total added scroll distance: ~1.3 viewports on desktop, ~0.9 viewports on mobile
         const getEndDistance = () =>
-          '+=' + Math.max(window.innerHeight * (isMobile ? 0.9 : 1.3), words.length * (isMobile ? 25 : 35));
+          '+=' + Math.max(window.innerHeight * (isMobile ? 0.9 : 1.3), words.length * (isMobile ? 25 : 35)) * sceneFactor();
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -57,7 +58,7 @@ export default function HelloSection() {
             end: getEndDistance,
             pin: true,
             pinSpacing: true,
-            scrub: 0.5,
+            scrub: scaleScrub(0.5),
             anticipatePin: 1,
             invalidateOnRefresh: true,
             markers: DEBUG
@@ -112,7 +113,7 @@ export default function HelloSection() {
         width: '100%',
         height: '100vh',
         minHeight: '100svh',
-        backgroundColor: '#E9E9E9',
+        backgroundColor: '#E2E2E2',
         color: '#181818',
         display: 'flex',
         flexDirection: 'column',

@@ -21,7 +21,7 @@ export default function IndustryDetailPage({ slug }) {
         position: 'relative',
         width: '100%',
         minHeight: '100vh',
-        backgroundColor: '#E9E9E9',
+        backgroundColor: '#E2E2E2',
         color: '#181818',
         padding: '120px 2rem 140px',
         boxSizing: 'border-box'

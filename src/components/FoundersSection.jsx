@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { contactInfo } from '../data/contact';
 import { Link } from '../lib/router';
 import { isDebugMode } from '../lib/hitch';
+import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,14 +21,20 @@ export default function FoundersSection() {
 
     const trigger = ScrollTrigger.create({
       trigger: el,
-      start: 'top 75%',
+      start: 'top 70%',
       markers: DEBUG,
       invalidateOnRefresh: true,
       onEnter: () => {
         gsap.fromTo(
           content.children,
           { y: 35, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out' }
+          {
+            y: 0,
+            opacity: 1,
+            duration: revealDuration(0.7),
+            stagger: revealStagger(0.12),
+            ease: softerEase('power3.out')
+          }
         );
       }
     });
@@ -181,6 +188,9 @@ export default function FoundersSection() {
                       fontSize: '1.4rem',
                       fontWeight: 900
                     }}
+                    alt=""
+                    aria-hidden="true"
+                    data-placeholder={f.name === 'Oshim Kher' ? 'oshim-kher-portrait.jpg' : 'aishwarya-soni-portrait.jpg'}
                   >
                     {f.initials}
                   </div>
@@ -327,6 +337,7 @@ export default function FoundersSection() {
             Direct 1-on-1 strategy sessions with Forbes 30U30 honorees to analyze your capital allocation and scale backend margins.
           </p>
 
+          {/* OVERRIDE: Replace mailto: with Calendly link e.g., https://calendly.com/manifesttechmedia/executive-call */}
           <Link
             href={`mailto:${contactInfo.email}`}
             style={{

@@ -1,14 +1,21 @@
 import React from 'react';
 import { Link, useRouter } from '../lib/router';
 import { contactInfo } from '../data/contact';
+import { anchorDuration } from '../lib/scrollPace';
 
 export default function Footer() {
   const { pathname } = useRouter();
 
   const handleBackToTop = (e) => {
     e.preventDefault();
+    const currentY = typeof window !== 'undefined' ? window.scrollY : 0;
+    const dur = anchorDuration(currentY);
     if (window.lenis) {
-      window.lenis.scrollTo(0);
+      window.lenis.scrollTo(0, {
+        duration: dur,
+        easing: (t) => 1 - Math.pow(1 - t, 3),
+        lock: false
+      });
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -25,7 +32,7 @@ export default function Footer() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '5rem 2.5rem 2.5rem',
+        padding: '5rem 2.5rem calc(2.5rem + env(safe-area-inset-bottom))',
         boxSizing: 'border-box'
       }}
     >
@@ -261,6 +268,37 @@ export default function Footer() {
             </a>
           </div>
         </div>
+
+        {/* Credit line */}
+        <p
+          style={{
+            margin: '1rem 0 0',
+            fontSize: '0.8rem',
+            color: 'rgba(255, 255, 255, 0.5)',
+            fontWeight: 500,
+            overflowWrap: 'anywhere'
+          }}
+        >
+          Created and designed by{' '}
+          <a
+            href="https://jaybuilds-peach.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-credit-link"
+            style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+          >
+            JayBuilds
+            <span
+              style={{
+                position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px',
+                overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0
+              }}
+            >
+              {' '}(opens in a new tab)
+            </span>
+          </a>
+          <style>{`.footer-credit-link:hover, .footer-credit-link:focus-visible { color: #FFFFFF !important; }`}</style>
+        </p>
       </div>
     </footer>
   );

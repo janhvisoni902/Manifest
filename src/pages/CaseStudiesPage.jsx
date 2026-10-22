@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from '../lib/router';
 
 export default function CaseStudiesPage({ onScheduleCall }) {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -319,9 +320,16 @@ export default function CaseStudiesPage({ onScheduleCall }) {
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '1.2rem' }}>
               Want results like these engineered for your business?
             </h3>
-            <button
-              onClick={onScheduleCall}
+            <Link
+              href="/book"
+              onClick={(e) => {
+                if (onScheduleCall) {
+                  e.preventDefault();
+                  onScheduleCall();
+                }
+              }}
               style={{
+                display: 'inline-block',
                 borderRadius: '9999px',
                 padding: '1rem 2.5rem',
                 fontSize: '0.92rem',
@@ -331,11 +339,12 @@ export default function CaseStudiesPage({ onScheduleCall }) {
                 color: '#0F1017',
                 border: 'none',
                 cursor: 'pointer',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                textDecoration: 'none'
               }}
             >
-              Schedule A Strategy Call
-            </button>
+              Book a Strategy Call
+            </Link>
           </div>
 
         </div>

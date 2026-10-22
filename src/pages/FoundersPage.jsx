@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import Footer from '../components/Footer';
-import { contactInfo } from '../data/contact';
+import { Link } from '../lib/router';
 
 export default function FoundersPage({ onScheduleCall }) {
-  const handleCTA = onScheduleCall || (() => { window.location.href = `mailto:${contactInfo.email}`; });
 
   useEffect(() => {
     document.title = "Founders & Leadership | manifestTechmedia";
@@ -37,10 +36,10 @@ export default function FoundersPage({ onScheduleCall }) {
   ];
 
   return (
-    <div style={{ backgroundColor: '#e9e9e9', color: '#181818', minHeight: '100vh', paddingTop: '100px' }}>
+    <div style={{ backgroundColor: '#e2e2e2', color: '#181818', minHeight: '100vh', paddingTop: '100px' }}>
       
       {/* 1. Header & Hero Intro */}
-      <section style={{ padding: '80px 2.5rem 60px', backgroundColor: '#e9e9e9' }}>
+      <section style={{ padding: '80px 2.5rem 60px', backgroundColor: '#e2e2e2' }}>
         <div className="container" style={{ maxWidth: '1180px', margin: '0 auto' }}>
           
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '1.2rem' }}>
@@ -98,7 +97,7 @@ export default function FoundersPage({ onScheduleCall }) {
       </section>
 
       {/* 2. Executive Bio Cards (Generic Founder Teasers) */}
-      <section style={{ padding: '60px 2.5rem 100px', backgroundColor: '#e9e9e9' }}>
+      <section style={{ padding: '60px 2.5rem 100px', backgroundColor: '#e2e2e2' }}>
         <div className="container" style={{ maxWidth: '1180px', margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2.5rem' }}>
             
@@ -215,7 +214,7 @@ export default function FoundersPage({ onScheduleCall }) {
       </section>
 
       {/* 3. Operational Philosophy & Why Us */}
-      <section style={{ padding: '100px 2.5rem', backgroundColor: '#e9e9e9', borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}>
+      <section style={{ padding: '100px 2.5rem', backgroundColor: '#e2e2e2', borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}>
         <div className="container" style={{ maxWidth: '1180px', margin: '0 auto' }}>
           <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7A2331', display: 'block', marginBottom: '0.8rem' }}>
@@ -272,9 +271,16 @@ export default function FoundersPage({ onScheduleCall }) {
             <p style={{ fontSize: '1.05rem', color: '#555555', maxWidth: '680px', margin: '0 auto 2.5rem', lineHeight: 1.6 }}>
               Book a 1-on-1 executive strategy session to review your current acquisition bottlenecks and unit economics.
             </p>
-            <button
-              onClick={handleCTA}
+            <Link
+              href="/book"
+              onClick={(e) => {
+                if (onScheduleCall) {
+                  e.preventDefault();
+                  onScheduleCall();
+                }
+              }}
               style={{
+                display: 'inline-block',
                 borderRadius: '9999px',
                 padding: '1rem 2.5rem',
                 fontSize: '0.85rem',
@@ -285,14 +291,15 @@ export default function FoundersPage({ onScheduleCall }) {
                 border: 'none',
                 cursor: 'pointer',
                 textTransform: 'uppercase',
+                textDecoration: 'none',
                 boxShadow: '0 4px 20px rgba(122, 35, 49, 0.25)',
                 transition: 'transform 0.2s ease, backgroundColor 0.2s ease'
               }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#5c1a24')}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7A2331')}
             >
-              Schedule A Strategy Call
-            </button>
+              Book a Strategy Call
+            </Link>
           </div>
 
         </div>

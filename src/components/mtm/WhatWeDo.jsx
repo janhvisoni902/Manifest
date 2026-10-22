@@ -1,9 +1,33 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Observer } from 'gsap/Observer';
 import { Link, assetUrl } from '../../lib/router';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, Observer);
+
+/* ==========================================================================
+ * TUNABLE SETTINGS: horizontal scroll "hitch" (hold at each panel)
+ * --------------------------------------------------------------------------
+ * HOLD_MIN / HOLD_MAX  Hold length per panel, in "slides" (1 = the scroll
+ *                      distance of one slide movement). Longer text = longer
+ *                      hold. Override any panel with data-hold="0.8".
+ *                      Rule: (HOLD_MAX / 2 + 0.5) * UNIT must stay below
+ *                      ~0.8 * viewport height so one Page Down advances.
+ * UNIT                 Scroll distance (px) for one slide movement.
+ * SNAP_DELAY_MS        How long scrolling must be idle before settling.
+ * SNAP_DURATION        Settle animation length in seconds [min, max].
+ * MOVE_EASE            Ease of the sideways move between panels.
+ * STRICT_PAGING        Off by default. When true, one wheel/swipe gesture
+ *                      inside the section moves exactly one panel.
+ * ========================================================================== */
+const HOLD_MIN = 0.4;
+const HOLD_MAX = 0.65;
+const UNIT = () => window.innerHeight * 0.95;
+const SNAP_DELAY_MS = 140;
+const SNAP_DURATION = [0.25, 0.7];
+const MOVE_EASE = 'power1.inOut';
+const STRICT_PAGING = false;
 
 export default function WhatWeDo() {
   const triggerRef = useRef(null);
@@ -69,33 +93,132 @@ export default function WhatWeDo() {
       },
       (context) => {
         const { isDesktop } = context.conditions;
+        // Mobile and reduced motion: panels stack vertically via CSS. No pin, holds or snap.
+        if (!isDesktop) return;
 
-        if (isDesktop) {
-          const getScrollDistance = () => {
-            const trackWidth = trackEl.scrollWidth;
-            const viewportWidth = window.innerWidth;
-            return Math.max(0, trackWidth - viewportWidth);
-          };
+        const panels = gsap.utils.toArray(trackEl.querySelectorAll('.system-scene-panel'));
+        const holdFor = (panel) => {
+          const override = parseFloat(panel.dataset.hold);
+          if (!Number.isNaN(override)) return override;
+          const words = (panel.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+          return gsap.utils.clamp(HOLD_MIN, HOLD_MAX, 0.35 + words / 150);
+        };
 
-          gsap.to(trackEl, {
-            x: () => -getScrollDistance(),
-            ease: 'none',
-            scrollTrigger: {
-              trigger: triggerEl,
-              start: 'top top',
-              end: () => `+=${getScrollDistance()}`,
-              pin: true,
-              pinSpacing: true,
-              scrub: 1,
-              invalidateOnRefresh: true,
-              onRefresh: () => {
-                if (window.lenis) {
-                  window.lenis.resize();
-                }
-              }
+        // One timeline of alternating hold / move segments.
+        const tl = gsap.timeline({ defaults: { ease: 'none' } });
+        const centers = []; // timeline time of each hold centre
+        const moveStarts = []; // timeline time where each move (into panel i+1) starts
+        let t = 0;
+        panels.forEach((panel, i) => {
+          if (i > 0) {
+            moveStarts.push(t);
+            tl.to(trackEl, { x: () => -panel.offsetLeft, duration: 1, ease: MOVE_EASE }, t);
+            t += 1;
+          }
+          const hold = holdFor(panel);
+          centers.push(t + hold / 2);
+          tl.to({}, { duration: hold }, t); // hold: nothing moves, scroll distance still passes
+          t += hold;
+        });
+
+        const st = ScrollTrigger.create({
+          trigger: triggerEl,
+          start: 'top top',
+          end: () => '+=' + tl.duration() * UNIT(),
+          pin: true,
+          pinSpacing: true,
+          scrub: 1,
+          animation: tl,
+          invalidateOnRefresh: true,
+          onRefresh: () => {
+            if (window.lenis) window.lenis.resize();
+          }
+        });
+
+        const centerPx = (i) => st.start + (centers[i] / tl.duration()) * (st.end - st.start);
+        // Panel that owns a timeline time: the boundary is halfway through each move.
+        const panelAt = (time) => moveStarts.filter((s) => time >= s + 0.5).length;
+
+        const scrollToPx = (px, duration = 0.6) => {
+          if (window.lenis) {
+            window.lenis.scrollTo(px, { duration, easing: (x) => 1 - Math.pow(1 - x, 2) });
+          } else {
+            window.scrollTo({ top: px, behavior: 'smooth' });
+          }
+        };
+
+        // Snap: debounced "scroll ended" handler (ScrollTrigger's built-in snap fights Lenis).
+        let snapTimer = null;
+        let snapping = false;
+        const settle = () => {
+          if (snapping || !st.isActive) return;
+          if (document.body.style.overflow === 'hidden') return; // intro / restore still running
+          const time = st.progress * tl.duration();
+          // The first and last panels release freely in their outer half (hand-off zones).
+          if (time <= centers[0] || time >= centers[centers.length - 1]) return;
+          const i = panelAt(time);
+          const target = centerPx(i);
+          const dist = Math.abs(window.scrollY - target);
+          if (dist < 2) return;
+          const unitPx = UNIT();
+          const dur = gsap.utils.clamp(SNAP_DURATION[0], SNAP_DURATION[1], (dist / unitPx) * SNAP_DURATION[1]);
+          snapping = true;
+          scrollToPx(target, dur);
+          setTimeout(() => { snapping = false; }, dur * 1000 + 60);
+        };
+        const onScroll = () => {
+          if (snapping) return;
+          clearTimeout(snapTimer);
+          snapTimer = setTimeout(settle, SNAP_DELAY_MS);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Keyboard focus inside an off-screen panel: bring that panel to its hold centre.
+        const onFocusIn = (e) => {
+          const panel = e.target.closest && e.target.closest('.system-scene-panel');
+          if (!panel) return;
+          triggerEl.scrollLeft = 0; // undo the browser's own scroll-into-view inside the clipped section
+          const i = panels.indexOf(panel);
+          if (i >= 0) scrollToPx(centerPx(i), 0.5);
+        };
+        triggerEl.addEventListener('focusin', onFocusIn);
+
+        // Optional strict paging (off by default): one gesture = one panel.
+        let observer = null;
+        if (STRICT_PAGING) {
+          let busy = false;
+          const page = (dir) => {
+            if (!st.isActive || busy) return;
+            const i = panelAt(st.progress * tl.duration());
+            const next = i + dir;
+            if (next < 0 || next >= panels.length) return; // let the page scroll out of the section
+            busy = true;
+            if (window.lenis) {
+              window.lenis.scrollTo(centerPx(next), { duration: 0.8, lock: true, onComplete: () => { busy = false; } });
+            } else {
+              window.scrollTo({ top: centerPx(next), behavior: 'smooth' });
+              setTimeout(() => { busy = false; }, 800);
             }
+          };
+          observer = Observer.create({
+            target: window,
+            type: 'wheel,touch',
+            tolerance: 10,
+            onDown: () => page(1),
+            onUp: () => page(-1)
           });
         }
+
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+
+        return () => {
+          clearTimeout(snapTimer);
+          window.removeEventListener('scroll', onScroll);
+          triggerEl.removeEventListener('focusin', onFocusIn);
+          if (observer) observer.kill();
+          st.kill();
+          tl.kill();
+        };
       }
     );
 
@@ -110,8 +233,7 @@ export default function WhatWeDo() {
         position: 'relative',
         width: '100%',
         maxWidth: '100vw',
-        height: '100vh',
-        minHeight: '100svh',
+        height: '100svh',
         overflow: 'hidden',
         backgroundColor: '#0F1017',
         color: '#FFFFFF',
@@ -126,7 +248,7 @@ export default function WhatWeDo() {
           display: 'flex',
           flexDirection: 'row',
           flexWrap: 'nowrap',
-          height: '100vh',
+          height: '100svh',
           alignItems: 'center',
           willChange: 'transform',
           width: 'max-content',
@@ -139,7 +261,7 @@ export default function WhatWeDo() {
           style={{
             flex: '0 0 100vw',
             width: '100vw',
-            height: '100vh',
+            height: '100svh',
             position: 'relative',
             overflow: 'hidden',
             backgroundColor: '#0F1017',
@@ -169,7 +291,7 @@ export default function WhatWeDo() {
           style={{
             flex: '0 0 100vw',
             width: '100vw',
-            height: '100vh',
+            height: '100svh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -228,7 +350,7 @@ export default function WhatWeDo() {
             style={{
               flex: '0 0 100vw',
               width: '100vw',
-              height: '100vh',
+              height: '100svh',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -281,7 +403,7 @@ export default function WhatWeDo() {
             <h3
               style={{
                 fontFamily: 'var(--font-intro)',
-                fontSize: 'clamp(3.5rem, 8.5vw, 8rem)',
+                fontSize: 'clamp(3rem, min(8.5vw, 14svh), 8rem)',
                 fontWeight: 900,
                 letterSpacing: '-0.04em',
                 lineHeight: 0.9,
@@ -314,7 +436,7 @@ export default function WhatWeDo() {
           style={{
             flex: '0 0 100vw',
             width: '100vw',
-            height: '100vh',
+            height: '100svh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -331,7 +453,7 @@ export default function WhatWeDo() {
               textTransform: 'uppercase',
               color: 'rgba(255, 255, 255, 0.6)',
               display: 'block',
-              marginBottom: '1.2rem'
+              marginBottom: 'clamp(0.6rem, 2svh, 1.2rem)'
             }}
           >
             — THE REVENUE SYSTEM
@@ -339,11 +461,11 @@ export default function WhatWeDo() {
           <h3
             style={{
               fontFamily: 'var(--font-intro)',
-              fontSize: 'clamp(2.5rem, 5.5vw, 5rem)',
+              fontSize: 'clamp(2rem, min(5.5vw, 9svh), 5rem)',
               fontWeight: 900,
               letterSpacing: '-0.03em',
               color: '#FFFFFF',
-              margin: '0 0 2rem 0',
+              margin: '0 0 clamp(0.8rem, 3svh, 2rem) 0',
               textTransform: 'uppercase'
             }}
           >
@@ -354,9 +476,9 @@ export default function WhatWeDo() {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '1.2rem',
+              gap: 'clamp(0.5rem, 1.8svh, 1.2rem)',
               maxWidth: '900px',
-              marginBottom: '2.5rem'
+              marginBottom: 'clamp(1rem, 4svh, 2.5rem)'
             }}
           >
             {revenueStages.map((stage) => (
@@ -368,7 +490,7 @@ export default function WhatWeDo() {
                   alignItems: 'center',
                   gap: '1.5rem',
                   borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-                  paddingBottom: '0.8rem'
+                  paddingBottom: 'clamp(0.4rem, 1.2svh, 0.8rem)'
                 }}
               >
                 <span
@@ -432,7 +554,7 @@ export default function WhatWeDo() {
       </div>
 
       <style>{`
-        @media (max-width: 767px) {
+        @media (max-width: 767px), (prefers-reduced-motion: reduce) {
           #what-we-do-section {
             height: auto !important;
             overflow: visible !important;

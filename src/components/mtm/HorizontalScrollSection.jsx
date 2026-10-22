@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { sceneFactor, scaleScrub } from '../../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,10 +23,10 @@ export default function HorizontalScrollSection({ children }) {
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: () => `+=${Math.max(1200, track.scrollWidth - window.innerWidth)}`,
+          end: () => `+=${Math.max(1200, track.scrollWidth - window.innerWidth) * sceneFactor()}`,
           pin: true,
           pinSpacing: true,
-          scrub: 1.2,
+          scrub: scaleScrub(1.2),
           invalidateOnRefresh: true,
           anticipatePin: 1,
           onRefresh: () => {

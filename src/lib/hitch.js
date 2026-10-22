@@ -23,7 +23,7 @@ export function createHitchTrigger({
 
   const trigger = ScrollTrigger.create({
     trigger: sectionEl,
-    start: 'top 80%',
+    start: 'top 75%',
     markers: DEBUG,
     invalidateOnRefresh: true,
     onEnter: () => {

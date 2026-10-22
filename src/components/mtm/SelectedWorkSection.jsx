@@ -31,7 +31,7 @@ export default function SelectedWorkSection() {
       id="selected-work"
       style={{
         padding: '120px 2.5rem',
-        backgroundColor: '#E9E9E9',
+        backgroundColor: '#E2E2E2',
         color: '#000000',
         borderTop: '1px solid rgba(0, 0, 0, 0.1)',
         boxSizing: 'border-box'

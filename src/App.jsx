@@ -4,9 +4,12 @@ import 'lenis/dist/lenis.css';
 import { gsap, ScrollTrigger } from './lib/gsap';
 import { RouterProvider, useRouter } from './lib/router';
 import { initGlobalRefreshListeners } from './lib/refresh';
+import { scaleDuration, scaleWheel } from './lib/scrollPace';
 
 // Navigation & Structure
 import Intro from './components/Intro';
+import { IntroContext } from './lib/introContext';
+import { BookingProvider } from './lib/bookingContext';
 
 // Pages
 import Home from './pages/Home';
@@ -19,10 +22,21 @@ import IndustryDetailPage from './pages/IndustryDetailPage';
 function AppContent() {
   const { pathname } = useRouter();
   const [sequenceState, setSequenceState] = useState(() => {
-    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const initialPath = typeof window !== 'undefined' ? window.location.pathname : '/';
     const isHome = initialPath === '/' || initialPath === '/Manifest' || initialPath === '/Manifest/';
-    if (prefersReducedMotion || !isHome) {
+
+    const hasSeenIntro = (() => {
+      try {
+        return typeof window !== 'undefined' && window.sessionStorage.getItem('intro:seen') === '1';
+      } catch {
+        return false;
+      }
+    })();
+
+    if (prefersReducedMotion || !isHome || hasSeenIntro) {
       return 'completed';
     }
     return 'loading';
@@ -32,7 +46,27 @@ function AppContent() {
   const [transitionState, setTransitionState] = useState('entering'); // 'entering' | 'exiting'
   const lenisRef = useRef(null);
 
-  // Optional failsafe timer: Guarantee sequenceState transitions if frozen after 12s
+  // Sync body data attribute and class so other components (e.g. Header/Navbar) know if intro is active
+  useEffect(() => {
+    const isIntro = sequenceState !== 'completed' && (pathname === '/' || pathname === '/Manifest' || pathname === '/Manifest/');
+    if (typeof document !== 'undefined') {
+      if (isIntro) {
+        document.body.classList.add('intro-playing');
+        document.body.setAttribute('data-intro-playing', 'true');
+      } else {
+        document.body.classList.remove('intro-playing');
+        document.body.removeAttribute('data-intro-playing');
+      }
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('intro-playing');
+        document.body.removeAttribute('data-intro-playing');
+      }
+    };
+  }, [sequenceState, pathname]);
+
+  // Failsafe timer: Guarantee sequenceState transitions if frozen after 12s
   useEffect(() => {
     if (sequenceState !== 'completed') {
       const timer = setTimeout(() => {
@@ -42,24 +76,20 @@ function AppContent() {
     }
   }, [sequenceState]);
 
-  // 1. Force manual scroll restoration and reset to top 0 on initial app load
+  // Initialize Lenis smooth scroll
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
-    window.scrollTo(0, 0);
-  }, []);
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // 1b. Initialize Lenis smooth scroll
-  useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: prefersReduced ? 0.001 : scaleDuration(1.2),
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
+      smoothWheel: !prefersReduced,
+      wheelMultiplier: prefersReduced ? 1 : scaleWheel(1),
+      touchMultiplier: 2
     });
 
     lenisRef.current = lenis;
@@ -75,7 +105,33 @@ function AppContent() {
 
     const cleanupRefresh = initGlobalRefreshListeners();
 
+    // Listen to prefers-reduced-motion dynamic change
+    let motionQuery = null;
+    let handleMotionChange = null;
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      handleMotionChange = (e) => {
+        if (lenisRef.current) {
+          lenisRef.current.options.smoothWheel = !e.matches;
+          lenisRef.current.options.duration = e.matches ? 0.001 : scaleDuration(1.2);
+          lenisRef.current.options.wheelMultiplier = e.matches ? 1 : scaleWheel(1);
+        }
+      };
+      if (motionQuery.addEventListener) {
+        motionQuery.addEventListener('change', handleMotionChange);
+      } else if (motionQuery.addListener) {
+        motionQuery.addListener(handleMotionChange);
+      }
+    }
+
     return () => {
+      if (motionQuery && handleMotionChange) {
+        if (motionQuery.removeEventListener) {
+          motionQuery.removeEventListener('change', handleMotionChange);
+        } else if (motionQuery.removeListener) {
+          motionQuery.removeListener(handleMotionChange);
+        }
+      }
       cleanupRefresh();
       lenis.destroy();
       gsap.ticker.remove(tick);
@@ -84,7 +140,7 @@ function AppContent() {
     };
   }, []);
 
-  // 2. Separate Scroll Lock / Unlock lifecycle during intro & reveal animation
+  // Separate Scroll Lock / Unlock lifecycle during shimmery intro animation
   useEffect(() => {
     const lenis = lenisRef.current;
 
@@ -94,39 +150,26 @@ function AppContent() {
       window.scrollTo(0, 0);
     } else {
       document.body.style.overflow = '';
-      window.scrollTo(0, 0);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('hasSeenIntro', 'true');
-      }
       if (lenis) {
-        lenis.scrollTo(0, { immediate: true });
         lenis.start();
         lenis.resize();
       }
-
       document.fonts.ready.then(() => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            window.scrollTo(0, 0);
-            if (lenis) {
-              lenis.scrollTo(0, { immediate: true });
-              lenis.resize();
-            }
-            ScrollTrigger.refresh();
-          });
+          ScrollTrigger.refresh();
         });
       });
     }
   }, [sequenceState]);
 
-  // 3. Page Transition Route Handler
+  // Page Transition Route Handler
   useEffect(() => {
     if (pathname !== displayPath) {
       setTransitionState('exiting');
       const timer = setTimeout(() => {
         setDisplayPath(pathname);
         setTransitionState('entering');
-        
+
         window.scrollTo(0, 0);
         if (lenisRef.current) {
           lenisRef.current.scrollTo(0, { immediate: true });
@@ -136,7 +179,7 @@ function AppContent() {
     }
   }, [pathname, displayPath]);
 
-  // 4. Layout stabilization checks
+  // Layout stabilization checks
   useEffect(() => {
     if (transitionState === 'entering') {
       setTimeout(() => {
@@ -149,6 +192,11 @@ function AppContent() {
   }, [displayPath, transitionState]);
 
   const handleGlobalSkip = () => {
+    try {
+      sessionStorage.setItem('intro:seen', '1');
+    } catch {
+      /* ignore */
+    }
     setSequenceState('completed');
   };
 
@@ -172,36 +220,50 @@ function AppContent() {
             sequenceState={sequenceState}
             setSequenceState={setSequenceState}
             handleGlobalSkip={handleGlobalSkip}
+            onSkipAll={handleGlobalSkip}
           />
         );
     }
   };
 
-  return (
-    <div className="app-container" style={{ overflowX: 'clip', width: '100%', maxWidth: '100vw' }}>
-      {/* Intro splash overlay */}
-      {sequenceState === 'loading' && pathname === '/' && (
-        <Intro onFinished={() => setSequenceState('completed')} />
-      )}
+  const isIntroActive =
+    sequenceState !== 'completed' &&
+    (pathname === '/' || pathname === '/Manifest' || pathname === '/Manifest/');
 
-      <main
-        style={{
-          opacity: transitionState === 'entering' ? 1 : 0,
-          transition: 'opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
-          width: '100%',
-          overflowX: 'clip'
-        }}
-      >
-        {renderActivePage(displayPath)}
-      </main>
-    </div>
+  return (
+    <IntroContext.Provider value={{ isIntroPlaying: isIntroActive, skipIntro: handleGlobalSkip }}>
+      <div className="app-container" style={{ overflowX: 'clip', width: '100%', maxWidth: '100vw' }}>
+        {/* Full shimmery intro splash overlay */}
+        {sequenceState === 'loading' && pathname === '/' && (
+          <Intro
+            onFinished={() => setSequenceState('completed')}
+            onSkip={handleGlobalSkip}
+          />
+        )}
+
+        <main
+          style={{
+            opacity: transitionState === 'entering' ? 1 : 0,
+            transition: 'opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
+            width: '100%',
+            overflowX: 'clip'
+          }}
+        >
+          {renderActivePage(displayPath)}
+        </main>
+      </div>
+    </IntroContext.Provider>
   );
 }
 
 export default function App() {
   return (
     <RouterProvider>
-      <AppContent />
+      <BookingProvider>
+        <AppContent />
+      </BookingProvider>
     </RouterProvider>
   );
 }
+
+

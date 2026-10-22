@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, assetUrl } from '../lib/router';
+import { revealDuration, revealStagger } from '../lib/scrollPace';
 
 export default function LeadersSection() {
   const leaders = [
@@ -29,7 +30,7 @@ export default function LeadersSection() {
         position: 'relative',
         zIndex: 2,
         width: '100%',
-        backgroundColor: '#E9E9E9',
+        backgroundColor: '#E2E2E2',
         color: '#181818',
         padding: '140px 2.5rem 160px',
         boxSizing: 'border-box'
@@ -42,8 +43,8 @@ export default function LeadersSection() {
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+            viewport={{ once: true, margin: '0px 0px -15% 0px' }}
+            transition={{ duration: revealDuration(0.8), ease: [0.25, 1, 0.5, 1] }}
             style={{
               fontFamily: 'var(--font-intro, sans-serif)',
               fontSize: 'clamp(3.2rem, 7vw, 6.2rem)',
@@ -61,8 +62,8 @@ export default function LeadersSection() {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
+            viewport={{ once: true, margin: '0px 0px -15% 0px' }}
+            transition={{ duration: revealDuration(0.8), delay: revealStagger(0.15), ease: [0.25, 1, 0.5, 1] }}
             style={{
               fontFamily: 'var(--font-mono, monospace)',
               fontSize: 'clamp(0.85rem, 1.2vw, 1.05rem)',
@@ -94,8 +95,8 @@ export default function LeadersSection() {
               key={leader.id}
               initial={{ opacity: 0, y: 35 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: index * 0.18, ease: [0.25, 1, 0.5, 1] }}
+              viewport={{ once: true, margin: '0px 0px -15% 0px' }}
+              transition={{ duration: revealDuration(0.8), delay: index * revealStagger(0.18), ease: [0.25, 1, 0.5, 1] }}
               style={{
                 display: 'flex',
                 flexDirection: 'column',

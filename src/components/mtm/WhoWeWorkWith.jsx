@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { scaleScrub } from '../../lib/scrollPace';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,7 +28,7 @@ export default function WhoWeWorkWith() {
       trigger: sectionRef.current,
       start: 'top 80%',
       end: 'top 20%',
-      scrub: true,
+      scrub: scaleScrub(true),
       onUpdate: (self) => {
         const opacity = 0.25 + self.progress * 0.75;
         if (el) el.style.opacity = opacity.toFixed(2);

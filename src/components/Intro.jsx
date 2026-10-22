@@ -1,22 +1,42 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
-export default function Intro({ onComplete, onFinished }) {
+export default function Intro({ onComplete, onFinished, onSkip }) {
   const splashRef = useRef(null);
   const title1Ref = useRef(null);
   const title2Ref = useRef(null);
   const lineRef = useRef(null);
   const counterRef = useRef(null);
   const perimeterRef = useRef(null);
+  const tlRef = useRef(null);
 
   const handleFinish = onComplete || onFinished || (() => {});
+  const handleFinishRef = useRef(handleFinish);
+  handleFinishRef.current = handleFinish;
+
+  const handleSkipClick = () => {
+    if (tlRef.current) {
+      tlRef.current.kill();
+    }
+    if (onSkip) {
+      onSkip();
+    } else if (handleFinishRef.current) {
+      handleFinishRef.current();
+    }
+  };
 
   useEffect(() => {
     const tl = gsap.timeline({
       onComplete: () => {
-        if (handleFinish) handleFinish();
+        try {
+          sessionStorage.setItem('intro:seen', '1');
+        } catch {
+          /* ignore storage error */
+        }
+        if (handleFinishRef.current) handleFinishRef.current();
       }
     });
+    tlRef.current = tl;
 
     // 1. Initial perimeter tags fade in & line reveal
     tl.to(perimeterRef.current, {
@@ -95,13 +115,57 @@ export default function Intro({ onComplete, onFinished }) {
         <span className="perimeter-tag top-left" style={{ opacity: 0.6, top: '40px', left: '40px' }}>
           MANIFEST TECH MEDIA
         </span>
-        <span className="perimeter-tag top-right" style={{ opacity: 0.6, top: '40px', right: '40px' }}>
-          REVENUE ENGINEERING
-        </span>
         <span className="perimeter-tag bottom-left" style={{ opacity: 0.6, bottom: '40px', left: '40px' }}>
           SYSTEM ARCHITECTURE
         </span>
       </div>
+
+      {/* Skip Intro Button */}
+      <button
+        type="button"
+        onClick={handleSkipClick}
+        aria-label="Skip intro animation"
+        style={{
+          position: 'fixed',
+          top: '32px',
+          right: '32px',
+          zIndex: 100000,
+          background: 'rgba(255, 255, 255, 0.08)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '9999px',
+          color: 'rgba(255, 255, 255, 0.85)',
+          padding: '0.45rem 1rem',
+          fontFamily: 'var(--font-mono, monospace)',
+          fontSize: '0.75rem',
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          transition: 'all 0.2s ease',
+          outline: 'none'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.16)';
+          e.currentTarget.style.color = '#FFFFFF';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+          e.currentTarget.style.color = 'rgba(255, 255, 255, 0.85)';
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.outline = '2px solid #BAE6FD';
+          e.currentTarget.style.outlineOffset = '2px';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.outline = 'none';
+        }}
+      >
+        <span>Skip intro</span>
+        <span aria-hidden="true">→</span>
+      </button>
 
       {/* Giant Background Counter */}
       <div
