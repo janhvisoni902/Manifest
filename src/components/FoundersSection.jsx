@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from '../lib/router';
+import FAQSection from './FAQSection';
 import { isDebugMode } from '../lib/hitch';
 import { revealDuration, revealStagger, softerEase } from '../lib/scrollPace';
 
@@ -313,6 +314,9 @@ export default function FoundersSection() {
             </div>
           ))}
         </div>
+
+        {/* FAQ SECTION */}
+        <FAQSection />
 
         {/* BOTTOM STRATEGY CALL BANNER */}
         <div

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link, useRouter } from '../lib/router';
-import { contactInfo } from '../data/contact';
 import { anchorDuration } from '../lib/scrollPace';
 
 export default function Footer() {
   const { pathname } = useRouter();
+  const SHOW_CASE_STUDIES = false;
 
   const handleBackToTop = (e) => {
     e.preventDefault();
@@ -124,9 +124,9 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/system"
+                  href="/#system"
                   style={{
-                    color: pathname === '/system' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                    color: 'rgba(255, 255, 255, 0.75)',
                     textDecoration: 'none'
                   }}
                 >
@@ -135,26 +135,28 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/founders"
+                  href="/about"
                   style={{
-                    color: pathname === '/founders' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                    color: pathname === '/about' || pathname === '/founders' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
                     textDecoration: 'none'
                   }}
                 >
                   Founders
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/case-studies"
-                  style={{
-                    color: pathname === '/case-studies' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
-                    textDecoration: 'none'
-                  }}
-                >
-                  Case Studies
-                </Link>
-              </li>
+              {SHOW_CASE_STUDIES && (
+                <li>
+                  <Link
+                    href="/case-studies"
+                    style={{
+                      color: pathname === '/case-studies' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Case Studies
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -186,10 +188,26 @@ export default function Footer() {
                 fontWeight: 500
               }}
             >
-              <li>Paid Acquisition Engine</li>
-              <li>Conversion Funnel Architecture</li>
-              <li>Backend Revenue Systems</li>
-              <li>Predictive Media Scaling</li>
+              <li>
+                <Link href="/services" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none' }}>
+                  Paid Acquisition Engine
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none' }}>
+                  Conversion Funnel Architecture
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none' }}>
+                  Backend Revenue Systems
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none' }}>
+                  Predictive Media Scaling
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -212,22 +230,26 @@ export default function Footer() {
               Ready to build your revenue engine?
             </p>
             <Link
-              href={`mailto:${contactInfo.email}`}
+              href="/book"
+              className="nav-cta-btn"
               style={{
                 fontFamily: 'var(--font-mono, monospace)',
                 fontSize: '0.8rem',
-                fontWeight: 700,
+                fontWeight: 800,
                 color: '#0F1017',
                 backgroundColor: '#FFFFFF',
-                padding: '0.75rem 1.4rem',
+                padding: '0.85rem 1.6rem',
                 borderRadius: '9999px',
                 textDecoration: 'none',
-                display: 'inline-block',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase'
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                transition: 'all 0.3s ease'
               }}
             >
-              GET IN TOUCH →
+              Book a Strategy Call
             </Link>
           </div>
         </div>
@@ -247,8 +269,30 @@ export default function Footer() {
             fontWeight: 500
           }}
         >
-          <div>
-            © 2026 Manifest Tech Media. All rights reserved.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+            <span>© 2026 Manifest Tech Media. All rights reserved.</span>
+            <span style={{ opacity: 0.35 }} aria-hidden="true">·</span>
+            <Link
+              href="/privacy"
+              style={{
+                color: 'rgba(255, 255, 255, 0.65)',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease'
+              }}
+            >
+              Privacy Policy
+            </Link>
+            <span style={{ opacity: 0.35 }} aria-hidden="true">·</span>
+            <Link
+              href="/terms"
+              style={{
+                color: 'rgba(255, 255, 255, 0.65)',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease'
+              }}
+            >
+              Terms
+            </Link>
           </div>
           <div>
             <a

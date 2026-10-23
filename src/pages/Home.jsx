@@ -110,17 +110,35 @@ export default function Home({ sequenceState, onSkipAll }) {
   useEffect(() => {
     if (phase !== 'done') return;
     heroAlreadyPlayed = true;
-    window.scrollTo(0, 0);
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
     unlockScroll();
     const t = setTimeout(() => {
       if (window.lenis) {
-        window.lenis.scrollTo(0, { immediate: true });
+        if (!window.location.hash) {
+          window.lenis.scrollTo(0, { immediate: true });
+        }
         window.lenis.resize();
       }
       ScrollTrigger.refresh();
+      if (window.location.hash) {
+        const targetEl = document.querySelector(window.location.hash);
+        if (targetEl) {
+          if (window.lenis) {
+            window.lenis.scrollTo(targetEl, {
+              duration: 1.2,
+              easing: (t) => 1 - Math.pow(1 - t, 3),
+              lock: false
+            });
+          } else {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
       const pinnedTriggers = ScrollTrigger.getAll().filter((tr) => tr.pin);
       console.log('Pinned ScrollTriggers (Allowlist Validation):', pinnedTriggers);
-    }, 100);
+    }, 150);
     return () => clearTimeout(t);
   }, [phase, unlockScroll]);
 

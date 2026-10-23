@@ -6,7 +6,7 @@ const BASE = import.meta.env.BASE_URL || '/';
 
 function normalizePath(rawPath) {
   if (!rawPath) return '/';
-  let path = rawPath;
+  let path = rawPath.split('#')[0] || '/';
   const baseNoTrailing = BASE.endsWith('/') ? BASE.slice(0, -1) : BASE;
   if (baseNoTrailing && (path === baseNoTrailing || path.startsWith(baseNoTrailing + '/'))) {
     path = path.slice(baseNoTrailing.length);
@@ -15,6 +15,25 @@ function normalizePath(rawPath) {
     path = '/' + path;
   }
   return path || '/';
+}
+
+function scrollToHash(hash) {
+  if (!hash) return;
+  const targetId = hash.startsWith('#') ? hash : `#${hash}`;
+  const el = document.querySelector(targetId);
+  if (!el) return;
+  const targetY = el.getBoundingClientRect().top + window.scrollY;
+  const dist = Math.abs(targetY - window.scrollY);
+  const dur = anchorDuration(dist);
+  if (window.lenis) {
+    window.lenis.scrollTo(el, {
+      duration: dur,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
+      lock: false
+    });
+  } else {
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
 function withBase(href) {
@@ -43,41 +62,73 @@ export function RouterProvider({ children }) {
   useEffect(() => {
     const handlePopState = () => {
       setPathname(normalizePath(window.location.pathname));
+      if (window.location.hash) {
+        setTimeout(() => scrollToHash(window.location.hash), 150);
+      }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigate = (href) => {
-    // If it's an anchor on the same page, let PopState handle it or use normal hash routing
-    if (href.startsWith('#')) {
-      const el = document.querySelector(href);
-      if (el) {
-        const targetY = el.getBoundingClientRect().top + window.scrollY;
-        const dist = Math.abs(targetY - window.scrollY);
-        const dur = anchorDuration(dist);
-        if (window.lenis) {
-          window.lenis.scrollTo(el, {
-            duration: dur,
-            easing: (t) => 1 - Math.pow(1 - t, 3),
-            lock: false
-          });
-        } else {
-          el.scrollIntoView({ behavior: 'smooth' });
+  // Handle initial hash on page load / return visit
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      let attempts = 0;
+      const pollTarget = () => {
+        const el = document.querySelector(window.location.hash);
+        if (el) {
+          scrollToHash(window.location.hash);
+        } else if (attempts < 15) {
+          attempts++;
+          setTimeout(pollTarget, 150);
         }
-      }
+      };
+      setTimeout(pollTarget, 300);
+    }
+  }, []);
+
+  const navigate = (href) => {
+    const hashIndex = href.indexOf('#');
+    const hasHash = hashIndex !== -1;
+    const pathPart = hasHash ? href.slice(0, hashIndex) : href;
+    const hashPart = hasHash ? href.slice(hashIndex) : '';
+
+    const targetPath = normalizePath(pathPart || (href.startsWith('#') ? pathname : '/'));
+
+    // If staying on the same page with a hash, smooth scroll directly
+    if (hasHash && targetPath === pathname) {
+      const targetUrl = withBase(href);
+      window.history.pushState(null, '', targetUrl);
+      scrollToHash(hashPart);
       return;
     }
 
-    // Scroll to top instantly before loading new page content
-    window.scrollTo(0, 0);
-    if (window.lenis) {
-      window.lenis.scrollTo(0, { immediate: true });
+    // Scroll to top instantly before loading new page content if no hash
+    if (!hasHash) {
+      window.scrollTo(0, 0);
+      if (window.lenis) {
+        window.lenis.scrollTo(0, { immediate: true });
+      }
     }
 
     const targetUrl = withBase(href);
     window.history.pushState(null, '', targetUrl);
-    setPathname(normalizePath(href));
+    setPathname(targetPath);
+
+    // If coming from another page with a hash, scroll once the target element renders
+    if (hasHash) {
+      let attempts = 0;
+      const pollTarget = () => {
+        const el = document.querySelector(hashPart);
+        if (el) {
+          scrollToHash(hashPart);
+        } else if (attempts < 20) {
+          attempts++;
+          setTimeout(pollTarget, 100);
+        }
+      };
+      setTimeout(pollTarget, 250);
+    }
   };
 
   return (
