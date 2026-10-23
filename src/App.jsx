@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger } from './lib/gsap';
 import { RouterProvider, useRouter } from './lib/router';
 import { initGlobalRefreshListeners } from './lib/refresh';
 import { scaleDuration, scaleWheel } from './lib/scrollPace';
+import './lib/utm.js';
 
 // Navigation & Structure
 import Intro from './components/Intro';
