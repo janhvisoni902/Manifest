@@ -8,14 +8,16 @@ import { scaleDuration, scaleWheel } from './lib/scrollPace';
 
 // Navigation & Structure
 import Intro from './components/Intro';
+import Navbar from './components/Navbar';
+import MobileStickyBar from './components/MobileStickyBar';
 import { IntroContext } from './lib/introContext';
 import { BookingProvider } from './lib/bookingContext';
 
 // Pages
 import Home from './pages/Home';
 import CaseStudiesPage from './pages/CaseStudiesPage';
-import SystemPage from './pages/SystemPage';
-import FoundersPage from './pages/FoundersPage';
+import ServicesPage from './pages/ServicesPage';
+import AboutPage from './pages/AboutPage';
 import BookPage from './pages/BookPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
@@ -165,6 +167,18 @@ function AppContent() {
     }
   }, [sequenceState]);
 
+  // Immediate scroll to top and ScrollTrigger refresh on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
   // Page Transition Route Handler
   useEffect(() => {
     if (pathname !== displayPath) {
@@ -218,10 +232,10 @@ function AppContent() {
         return <TermsPage />;
       case '/services':
       case '/system':
-        return <SystemPage />;
+        return <ServicesPage />;
       case '/about':
       case '/founders':
-        return <FoundersPage />;
+        return <AboutPage />;
       case '/case-studies':
         return <CaseStudiesPage />;
       case '/':
@@ -252,6 +266,8 @@ function AppContent() {
           />
         )}
 
+        <Navbar />
+
         <main
           style={{
             opacity: transitionState === 'entering' ? 1 : 0,
@@ -262,6 +278,8 @@ function AppContent() {
         >
           {renderActivePage(displayPath)}
         </main>
+
+        <MobileStickyBar />
       </div>
     </IntroContext.Provider>
   );
