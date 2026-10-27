@@ -127,7 +127,7 @@ export default function Intro({ onComplete, onFinished, onSkip }) {
         aria-label="Skip intro animation"
         style={{
           position: 'fixed',
-          top: '32px',
+          bottom: '32px',
           right: '32px',
           zIndex: 100000,
           background: 'rgba(255, 255, 255, 0.08)',
